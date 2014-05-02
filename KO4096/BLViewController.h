@@ -23,11 +23,16 @@ typedef struct {
     BLMove m_lastMove;
     NSMutableArray *m_animationTempQueue;
     NSMutableArray *m_animationQueue;
+    UILabel *m_score;
+    UILabel *m_highScore;
 }
 
 -(IBAction)swipeUp:(id)sender;
 -(IBAction)swipeDown:(id)sender;
 -(IBAction)swipeLeft:(id)sender;
 -(IBAction)swipeRight:(id)sender;
+
+@property IBOutlet UILabel *score;
+@property IBOutlet UILabel *highScore;
 
 @end

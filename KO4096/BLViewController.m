@@ -16,6 +16,8 @@
 
 @implementation BLViewController
 
+@synthesize score=m_score, highScore=m_highScore;
+
 -(void) removeActiveTile:(UIView *)tile {
     [m_activeTiles removeObject:tile];
 }
@@ -113,6 +115,9 @@
 
 -(void) onScoreUpdate:(int) score {
     NSLog(@"score is now %d", score);
+    m_score.text = [NSString stringWithFormat:@"%d", score];
+    m_highScore.text = [NSString stringWithFormat:@"%d", score];
+    
 }
 
 -(void) onChangesComplete {

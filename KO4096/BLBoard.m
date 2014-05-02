@@ -10,7 +10,7 @@
 
 // Private Methods
 @interface BLBoard ()
--(void) shift:(int(^)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener>))shiftAction;
+-(void) shift:(int(^)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction;
 @end
 
 @implementation BLBoard
@@ -19,8 +19,8 @@
 
 // -=-=-=-=-=-=-= Helper Functions -=-=-=-=-=-=-=-=-=-
 
-BOOL (^consolidatePiece)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>) =
-^(int board[4][4], CGPoint from, CGPoint to, id<BLBoardEventListener>listener) {
+BOOL (^consolidatePiece)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
+^(int board[4][4], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
     int *source = &board[(int)from.x][(int)from.y];
     int *target = &board[(int)to.x][(int)to.y];
     if (*target != 0 && *target == *source) {
@@ -28,13 +28,15 @@ BOOL (^consolidatePiece)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>) 
         *source *= 2;
         *target *= 0;
         [listener onMergeFrom:to To:from Val:*source];
+        *score += *source;
+        [listener onScoreUpdate:*score];
         return YES;
     }
     return NO;
 };
 
-BOOL (^movePiece)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>) =
-^(int board[4][4], CGPoint from, CGPoint to, id<BLBoardEventListener>listener) {
+BOOL (^movePiece)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
+^(int board[4][4], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
     int *source = &board[(int)from.x][(int)from.y];
     int *target = &board[(int)to.x][(int)to.y];
     
@@ -47,12 +49,12 @@ BOOL (^movePiece)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>) =
     return NO;
 };
 
-int (^shiftUp)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener> listener) {
+int (^shiftUp)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
+^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int x = 0; x < 4; x++) {
         for (int y = 1; y < 4; y++) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x,y-1), listener);
+            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x,y-1), score, listener);
             if (actionChanged) {
                 changed++;
 
@@ -61,7 +63,7 @@ int (^shiftUp)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardE
                 }
                 
                 for (int y2 = y-1; y2 > 0 ; y2--) {
-                    if (!action(board, CGPointMake(x,y2), CGPointMake(x,y2-1), listener)) {
+                    if (!action(board, CGPointMake(x,y2), CGPointMake(x,y2-1), score, listener)) {
                         break;
                     }
                     
@@ -74,13 +76,12 @@ int (^shiftUp)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardE
     return changed;
 };
 
-
-int (^shiftDown)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener> listener) {
+int (^shiftDown)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
+^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int x = 0; x < 4; x++) {
         for (int y = 2; y >= 0; y--) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x,y+1), listener);
+            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x,y+1), score, listener);
             if (actionChanged) {
                 changed++;
 
@@ -89,7 +90,7 @@ int (^shiftDown)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoar
                 }
                 
                 for (int y2 = y+1; y2 < 3; y2++) {
-                    if (!action(board, CGPointMake(x,y2), CGPointMake(x,y2+1), listener)) {
+                    if (!action(board, CGPointMake(x,y2), CGPointMake(x,y2+1), score, listener)) {
                         break;
                     }
                     
@@ -102,12 +103,12 @@ int (^shiftDown)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoar
     return changed;
 };
 
-int (^shiftRight)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener> listener) {
+int (^shiftRight)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
+^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int y = 0; y < 4; y++) {
         for (int x = 2; x >= 0; x--) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x+1,y), listener);
+            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x+1,y), score, listener);
             if (actionChanged) {
                 changed++;
 
@@ -116,7 +117,7 @@ int (^shiftRight)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoa
                 }
                 
                 for (int x2 = x+1; x2 < 3 ; x2++) {
-                    if(!action(board, CGPointMake(x2,y), CGPointMake(x2+1,y), listener)) {
+                    if(!action(board, CGPointMake(x2,y), CGPointMake(x2+1,y), score, listener)) {
                         // if we didn't do anything, no point in doing anything more
                         break;
                     }
@@ -130,12 +131,12 @@ int (^shiftRight)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoa
     return changed;
 };
 
-int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener> listener) {
+int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>) =
+^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *score, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int y = 0; y < 4; y++) {
         for (int x = 1; x < 4; x++) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x-1,y), listener);
+            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x-1,y), score, listener);
             if (actionChanged) {
                 changed++;
 
@@ -144,7 +145,7 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoar
                 }
                 
                 for (int x2 = x-1; x2 > 0 ; x2--) {
-                    if(!action(board, CGPointMake(x2,y), CGPointMake(x2-1,y), listener)) {
+                    if(!action(board, CGPointMake(x2,y), CGPointMake(x2-1,y), score, listener)) {
                         // if we didn't do anything, no point in doing anything more
                         break;
                     }
@@ -173,15 +174,15 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoar
     return self;
 }
 
--(void) shift:(int(^)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, id<BLBoardEventListener>), id<BLBoardEventListener>))shiftAction {
+-(void) shift:(int(^)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction {
     BOOL shifted = NO;
     int numMerged = 0;
     NSString *before = [self description];
-    shifted |= shiftAction(m_board, NO, movePiece, m_listener) != 0;
+    shifted |= shiftAction(m_board, NO, movePiece, &m_score, m_listener) != 0;
     [m_listener onChangesComplete];
-    shifted |= (numMerged = shiftAction(m_board, YES, consolidatePiece, m_listener)) != 0;
+    shifted |= (numMerged = shiftAction(m_board, YES, consolidatePiece, &m_score, m_listener)) != 0;
     [m_listener onChangesComplete];
-    shifted |= shiftAction(m_board, NO, movePiece, m_listener) != 0;
+    shifted |= shiftAction(m_board, NO, movePiece, &m_score, m_listener) != 0;
     [m_listener onChangesComplete];
     
     NSLog(@"Num merged: %d", numMerged);
