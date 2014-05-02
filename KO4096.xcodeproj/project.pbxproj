@@ -21,6 +21,7 @@
 		B530545C18EA25BF00B2631D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B530543E18EA25BF00B2631D /* UIKit.framework */; };
 		B530546418EA25BF00B2631D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B530546218EA25BF00B2631D /* InfoPlist.strings */; };
 		B530546618EA25BF00B2631D /* KO4096Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B530546518EA25BF00B2631D /* KO4096Tests.m */; };
+		B530547118EA2A7500B2631D /* BLBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = B530547018EA2A7500B2631D /* BLBoard.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,8 @@
 		B530546118EA25BF00B2631D /* KO4096Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "KO4096Tests-Info.plist"; sourceTree = "<group>"; };
 		B530546318EA25BF00B2631D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B530546518EA25BF00B2631D /* KO4096Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KO4096Tests.m; sourceTree = "<group>"; };
+		B530546F18EA2A7500B2631D /* BLBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLBoard.h; sourceTree = "<group>"; };
+		B530547018EA2A7500B2631D /* BLBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLBoard.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +122,8 @@
 				B530545018EA25BF00B2631D /* BLViewController.m */,
 				B530545218EA25BF00B2631D /* Images.xcassets */,
 				B530544118EA25BF00B2631D /* Supporting Files */,
+				B530546F18EA2A7500B2631D /* BLBoard.h */,
+				B530547018EA2A7500B2631D /* BLBoard.m */,
 			);
 			path = KO4096;
 			sourceTree = "<group>";
@@ -252,6 +257,7 @@
 			files = (
 				B530545118EA25BF00B2631D /* BLViewController.m in Sources */,
 				B530544B18EA25BF00B2631D /* BLAppDelegate.m in Sources */,
+				B530547118EA2A7500B2631D /* BLBoard.m in Sources */,
 				B530544718EA25BF00B2631D /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
