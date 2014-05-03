@@ -16,7 +16,7 @@
 
 @implementation BLViewController
 
-@synthesize score=m_score, highScore=m_highScore;
+@synthesize score=m_scoreLbl, highScore=m_highScoreLbl;
 
 -(void) removeActiveTile:(UIView *)tile {
     [m_activeTiles removeObject:tile];
@@ -101,7 +101,7 @@
         [weakView addSubview:tile];
         tile.alpha = 0.75;
         tile.transform = CGAffineTransformMakeScale(0.01, 0.01);
-        [UIView animateWithDuration:0.25 delay:0.5 options:0 animations:^{
+        [UIView animateWithDuration:0.1 delay:0.25 options:0 animations:^{
             tile.alpha = 1.0;
             tile.transform = CGAffineTransformIdentity;
         } completion:^(BOOL finished) {
@@ -113,10 +113,29 @@
     }]];
 }
 
+-(void) onGameOver {
+    UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Game Over" message:@"Game is over, try again!" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Start New Game", nil];
+    [av show];
+}
+
+// Called when a button is clicked. The view will be automatically dismissed after this call returns
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [self startGame];
+}
+
+
 -(void) onScoreUpdate:(int) score {
     NSLog(@"score is now %d", score);
-    m_score.text = [NSString stringWithFormat:@"%d", score];
-    m_highScore.text = [NSString stringWithFormat:@"%d", score];
+    
+    m_scoreLbl.text = [NSString stringWithFormat:@"%d", score];
+    if (m_highScore < score) {
+        m_highScore = score;
+        NSLog(@"HIGSCORE CHANGE! %d", score);
+        m_highScoreLbl.text = [NSString stringWithFormat:@"%d", score];
+        NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+        [def setInteger:score forKey:@"highscore"];
+        [def synchronize];
+    }
     
 }
 
@@ -169,17 +188,40 @@
     impl.font = template.font;
     impl.textAlignment = template.textAlignment;
     impl.backgroundColor = template.backgroundColor;
+    CALayer *mask = [CALayer layer];
+    UIImage *maskImage = [UIImage imageNamed:@"mask"];
+    mask.frame = impl.bounds;
+    [mask setContents:(id)[maskImage CGImage]];
+    [impl.layer setMask:mask];
     impl.hidden = NO;
     impl.tag = pos + 100;
     [m_activeTiles addObject:impl];
     return impl;
 }
 
+-(void) startGame {
+    m_board = [BLBoard new];
+    m_board.listener = self;
+
+    // zero out the score on the screen
+    [self onScoreUpdate:0];
+    
+    [self drawBoard];
+}
+
+UIColor* rgba(int r, int g, int b, int a) {
+    return [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a];
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleLightContent;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    m_board = [BLBoard new];
-    m_board.listener = self;
+    self.view.layer.contents = [UIImage imageNamed:@"carbon-fiber"];
+    self.view.layer.bounds = self.view.bounds;
     m_animationQueue = [NSMutableArray new];
     m_animationTempQueue = [NSMutableArray new];
     m_tiles = @{
@@ -197,6 +239,19 @@
         @"4096":[self.view viewWithTag:4096]
     };
     
+    ((UILabel *)m_tiles[@"2"]).backgroundColor = rgba(9, 108, 31,1);
+    ((UILabel *)m_tiles[@"4"]).backgroundColor = rgba( 54, 159, 77,1);
+    ((UILabel *)m_tiles[@"8"]).backgroundColor = rgba(135, 212, 152,1);
+    ((UILabel *)m_tiles[@"16"]).backgroundColor = rgba(131, 156, 195,1);
+    ((UILabel *)m_tiles[@"32"]).backgroundColor = rgba(55, 88, 139,1);
+    ((UILabel *)m_tiles[@"64"]).backgroundColor = rgba(16, 47, 95,1);
+    ((UILabel *)m_tiles[@"128"]).backgroundColor = rgba( 143, 96, 12,1);
+    ((UILabel *)m_tiles[@"256"]).backgroundColor = rgba( 211, 160, 71,1);
+    ((UILabel *)m_tiles[@"512"]).backgroundColor = rgba( 255, 222, 163,1);
+    ((UILabel *)m_tiles[@"1024"]).backgroundColor = rgba( 255, 172, 163,1);
+    ((UILabel *)m_tiles[@"2048"]).backgroundColor = rgba( 211, 84, 71,1);
+    ((UILabel *)m_tiles[@"4096"]).backgroundColor = rgba( 143, 25, 12,1);
+    
     for (UIView *tile in [m_tiles allValues]) {
         tile.hidden = YES;
     }
@@ -204,8 +259,11 @@
     m_activeTiles = [NSMutableArray new];
     m_lastMove.isInitialized = NO;
     
-    [self drawBoard];
-	// Do any additional setup after loading the view, typically from a nib.
+    NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+    m_highScore = [def integerForKey:@"highscore"];
+    m_highScoreLbl.text = [NSString stringWithFormat:@"%ld", m_highScore];
+    
+    [self startGame];
 }
 
 - (void)didReceiveMemoryWarning

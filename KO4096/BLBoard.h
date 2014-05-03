@@ -15,11 +15,14 @@
 -(void) onMoveComplete;
 -(void) onNumberAdded:(CGPoint)location Val:(int) val;
 -(void) onScoreUpdate:(int) score;
+-(void) onGameOver;
 @end
+
+#define BOARD_WIDTH 4
 
 @interface BLBoard : NSObject
 {
-    int m_board[4][4];
+    int m_board[BOARD_WIDTH][BOARD_WIDTH];
     int m_spacesFree;
     int m_score;
     id<BLBoardEventListener> m_listener;

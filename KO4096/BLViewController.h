@@ -15,7 +15,7 @@ typedef struct {
     BOOL isInitialized;
 } BLMove;
 
-@interface BLViewController : UIViewController <BLBoardEventListener>
+@interface BLViewController : UIViewController <BLBoardEventListener,UIAlertViewDelegate>
 {
     BLBoard *m_board;
     NSDictionary *m_tiles;
@@ -23,8 +23,9 @@ typedef struct {
     BLMove m_lastMove;
     NSMutableArray *m_animationTempQueue;
     NSMutableArray *m_animationQueue;
-    UILabel *m_score;
-    UILabel *m_highScore;
+    UILabel *m_scoreLbl;
+    UILabel *m_highScoreLbl;
+    long m_highScore;
 }
 
 -(IBAction)swipeUp:(id)sender;

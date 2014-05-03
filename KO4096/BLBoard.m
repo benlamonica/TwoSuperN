@@ -10,7 +10,7 @@
 
 // Private Methods
 @interface BLBoard ()
--(void) shift:(int(^)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction;
+-(void) shift:(int(^)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction;
 @end
 
 @implementation BLBoard
@@ -19,8 +19,8 @@
 
 // -=-=-=-=-=-=-= Helper Functions -=-=-=-=-=-=-=-=-=-
 
-BOOL (^consolidatePiece)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
-^(int board[4][4], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
+BOOL (^consolidatePiece)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
     int *source = &board[(int)from.x][(int)from.y];
     int *target = &board[(int)to.x][(int)to.y];
     if (*target != 0 && *target == *source) {
@@ -35,8 +35,8 @@ BOOL (^consolidatePiece)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventList
     return NO;
 };
 
-BOOL (^movePiece)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
-^(int board[4][4], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
+BOOL (^movePiece)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
     int *source = &board[(int)from.x][(int)from.y];
     int *target = &board[(int)to.x][(int)to.y];
     
@@ -49,8 +49,8 @@ BOOL (^movePiece)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>) 
     return NO;
 };
 
-int (^shiftUp)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+int (^shiftUp)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int x = 0; x < 4; x++) {
         for (int y = 1; y < 4; y++) {
@@ -76,8 +76,8 @@ int (^shiftUp)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<B
     return changed;
 };
 
-int (^shiftDown)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+int (^shiftDown)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int x = 0; x < 4; x++) {
         for (int y = 2; y >= 0; y--) {
@@ -103,10 +103,10 @@ int (^shiftDown)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id
     return changed;
 };
 
-int (^shiftRight)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+int (^shiftRight)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
-    for (int y = 0; y < 4; y++) {
+    for (int y = 0; y < BOARD_WIDTH; y++) {
         for (int x = 2; x >= 0; x--) {
             BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x+1,y), score, listener);
             if (actionChanged) {
@@ -131,11 +131,11 @@ int (^shiftRight)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, i
     return changed;
 };
 
-int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>) =
-^(int board[4][4], BOOL onlyOnce, BOOL(^action)(int[4][4], CGPoint, CGPoint, int *score, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>) =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *score, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
-    for (int y = 0; y < 4; y++) {
-        for (int x = 1; x < 4; x++) {
+    for (int y = 0; y < BOARD_WIDTH; y++) {
+        for (int x = 1; x < BOARD_WIDTH; x++) {
             BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x-1,y), score, listener);
             if (actionChanged) {
                 changed++;
@@ -174,7 +174,7 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id
     return self;
 }
 
--(void) shift:(int(^)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction {
+-(void) shift:(int(^)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction {
     BOOL shifted = NO;
     int numMerged = 0;
     NSString *before = [self description];
@@ -213,13 +213,31 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id
     [self shift:shiftLeft];
 }
 
+-(BOOL) isGameOver {
+    int tempBoard[BOARD_WIDTH][BOARD_WIDTH];
+    int score = 0;
+    memcpy(tempBoard, m_board, sizeof(tempBoard));
+    BOOL shifted = NO;
+    // check to see if any of them would move should we try to go in any of these directions
+    shifted |= shiftUp(tempBoard, NO, movePiece, &score, nil) != 0;
+    shifted |= shiftUp(tempBoard, YES, consolidatePiece, &score, nil) != 0;
+    shifted |= shiftDown(tempBoard, NO, movePiece, &score, nil) != 0;
+    shifted |= shiftDown(tempBoard, YES, consolidatePiece, &score, nil) != 0;
+    shifted |= shiftLeft(tempBoard, NO, movePiece, &score, nil) != 0;
+    shifted |= shiftLeft(tempBoard, YES, consolidatePiece, &score, nil) != 0;
+    shifted |= shiftRight(tempBoard, NO, movePiece, &score, nil) != 0;
+    shifted |= shiftRight(tempBoard, YES, consolidatePiece, &score, nil) != 0;
+
+    return !shifted;
+}
+
 -(void) addDigit {
     BOOL digitPlaced = NO;
     int pos = arc4random_uniform(16);
     int num = arc4random_uniform(2);
     while (!digitPlaced && m_spacesFree > 0) {
-        int x = pos / 4;
-        int y = pos % 4;
+        int x = pos / BOARD_WIDTH;
+        int y = pos % BOARD_WIDTH;
         if (m_board[x][y] == 0) {
             if (num == 0) {
                 m_board[x][y] = 2;
@@ -240,6 +258,9 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id
     
     NSLog(@"spacesFree: %d", m_spacesFree);
 
+    if (m_spacesFree == 0 && [self isGameOver]) {
+        [m_listener onGameOver];
+    }
 }
 
 -(NSString *) description {
@@ -251,8 +272,8 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id
 }
 
 -(void) startOver {
-    for (int x = 0; x < 4; x++) {
-        for (int y = 0; y < 4; y++) {
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        for (int y = 0; y < BOARD_WIDTH; y++) {
             m_board[x][y] = 0;
         }
     }
@@ -269,7 +290,7 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id
 
 -(NSArray *) rows {
     NSMutableArray *a = [NSMutableArray new];
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < BOARD_WIDTH; i++) {
         [a addObject:@[@(m_board[0][i]), @(m_board[1][i]), @(m_board[2][i]), @(m_board[3][i])]];
     }
     
@@ -278,7 +299,7 @@ int (^shiftLeft)(int[4][4], BOOL, BOOL(^)(int[4][4], CGPoint, CGPoint, int *, id
 
 -(NSArray *) columns {
     NSMutableArray *a = [NSMutableArray new];
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < BOARD_WIDTH; i++) {
         [a addObject:@[@(m_board[i][0]), @(m_board[i][1]), @(m_board[i][2]), @(m_board[i][3])]];
     }
     

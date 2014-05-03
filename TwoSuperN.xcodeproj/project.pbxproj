@@ -35,7 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		B530543718EA25BF00B2631D /* KO4096.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KO4096.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B530543718EA25BF00B2631D /* TwoSuperN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwoSuperN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B530543A18EA25BF00B2631D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B530543C18EA25BF00B2631D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		B530543E18EA25BF00B2631D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -49,9 +49,9 @@
 		B530544F18EA25BF00B2631D /* BLViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLViewController.h; sourceTree = "<group>"; };
 		B530545018EA25BF00B2631D /* BLViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLViewController.m; sourceTree = "<group>"; };
 		B530545218EA25BF00B2631D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		B530545818EA25BF00B2631D /* KO4096Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KO4096Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B530545818EA25BF00B2631D /* TwoSuperNTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwoSuperNTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B530545918EA25BF00B2631D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		B530546118EA25BF00B2631D /* KO4096Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "KO4096Tests-Info.plist"; sourceTree = "<group>"; };
+		B530546118EA25BF00B2631D /* TwoSuperNTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwoSuperNTests-Info.plist"; sourceTree = "<group>"; };
 		B530546318EA25BF00B2631D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B530546518EA25BF00B2631D /* KO4096Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KO4096Tests.m; sourceTree = "<group>"; };
 		B530546F18EA2A7500B2631D /* BLBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLBoard.h; sourceTree = "<group>"; };
@@ -95,8 +95,8 @@
 		B530543818EA25BF00B2631D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B530543718EA25BF00B2631D /* KO4096.app */,
-				B530545818EA25BF00B2631D /* KO4096Tests.xctest */,
+				B530543718EA25BF00B2631D /* TwoSuperN.app */,
+				B530545818EA25BF00B2631D /* TwoSuperNTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -151,7 +151,7 @@
 		B530546018EA25BF00B2631D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				B530546118EA25BF00B2631D /* KO4096Tests-Info.plist */,
+				B530546118EA25BF00B2631D /* TwoSuperNTests-Info.plist */,
 				B530546218EA25BF00B2631D /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -160,9 +160,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B530543618EA25BF00B2631D /* KO4096 */ = {
+		B530543618EA25BF00B2631D /* TwoSuperN */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B530546918EA25BF00B2631D /* Build configuration list for PBXNativeTarget "KO4096" */;
+			buildConfigurationList = B530546918EA25BF00B2631D /* Build configuration list for PBXNativeTarget "TwoSuperN" */;
 			buildPhases = (
 				B530543318EA25BF00B2631D /* Sources */,
 				B530543418EA25BF00B2631D /* Frameworks */,
@@ -172,14 +172,14 @@
 			);
 			dependencies = (
 			);
-			name = KO4096;
+			name = TwoSuperN;
 			productName = KO4096;
-			productReference = B530543718EA25BF00B2631D /* KO4096.app */;
+			productReference = B530543718EA25BF00B2631D /* TwoSuperN.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B530545718EA25BF00B2631D /* KO4096Tests */ = {
+		B530545718EA25BF00B2631D /* TwoSuperNTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B530546C18EA25BF00B2631D /* Build configuration list for PBXNativeTarget "KO4096Tests" */;
+			buildConfigurationList = B530546C18EA25BF00B2631D /* Build configuration list for PBXNativeTarget "TwoSuperNTests" */;
 			buildPhases = (
 				B530545418EA25BF00B2631D /* Sources */,
 				B530545518EA25BF00B2631D /* Frameworks */,
@@ -190,9 +190,9 @@
 			dependencies = (
 				B530545E18EA25BF00B2631D /* PBXTargetDependency */,
 			);
-			name = KO4096Tests;
+			name = TwoSuperNTests;
 			productName = KO4096Tests;
-			productReference = B530545818EA25BF00B2631D /* KO4096Tests.xctest */;
+			productReference = B530545818EA25BF00B2631D /* TwoSuperNTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -210,7 +210,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B530543218EA25BE00B2631D /* Build configuration list for PBXProject "KO4096" */;
+			buildConfigurationList = B530543218EA25BE00B2631D /* Build configuration list for PBXProject "TwoSuperN" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -223,8 +223,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B530543618EA25BF00B2631D /* KO4096 */,
-				B530545718EA25BF00B2631D /* KO4096Tests */,
+				B530543618EA25BF00B2631D /* TwoSuperN */,
+				B530545718EA25BF00B2631D /* TwoSuperNTests */,
 			);
 		};
 /* End PBXProject section */
@@ -275,7 +275,7 @@
 /* Begin PBXTargetDependency section */
 		B530545E18EA25BF00B2631D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B530543618EA25BF00B2631D /* KO4096 */;
+			target = B530543618EA25BF00B2631D /* TwoSuperN */;
 			targetProxy = B530545D18EA25BF00B2631D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -384,9 +384,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "KO4096/KO4096-Prefix.pch";
+				GCC_PREFIX_HEADER = "KO4096/TwoSuperN-Prefix.pch";
 				INFOPLIST_FILE = "KO4096/KO4096-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = TwoSuperN;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -397,9 +397,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "KO4096/KO4096-Prefix.pch";
+				GCC_PREFIX_HEADER = "KO4096/TwoSuperN-Prefix.pch";
 				INFOPLIST_FILE = "KO4096/KO4096-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = TwoSuperN;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -419,8 +419,8 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "KO4096Tests/KO4096Tests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "KO4096Tests/TwoSuperNTests-Info.plist";
+				PRODUCT_NAME = TwoSuperNTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -437,8 +437,8 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KO4096/KO4096-Prefix.pch";
-				INFOPLIST_FILE = "KO4096Tests/KO4096Tests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "KO4096Tests/TwoSuperNTests-Info.plist";
+				PRODUCT_NAME = TwoSuperNTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -447,7 +447,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B530543218EA25BE00B2631D /* Build configuration list for PBXProject "KO4096" */ = {
+		B530543218EA25BE00B2631D /* Build configuration list for PBXProject "TwoSuperN" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B530546718EA25BF00B2631D /* Debug */,
@@ -456,7 +456,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B530546918EA25BF00B2631D /* Build configuration list for PBXNativeTarget "KO4096" */ = {
+		B530546918EA25BF00B2631D /* Build configuration list for PBXNativeTarget "TwoSuperN" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B530546A18EA25BF00B2631D /* Debug */,
@@ -465,7 +465,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B530546C18EA25BF00B2631D /* Build configuration list for PBXNativeTarget "KO4096Tests" */ = {
+		B530546C18EA25BF00B2631D /* Build configuration list for PBXNativeTarget "TwoSuperNTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B530546D18EA25BF00B2631D /* Debug */,
