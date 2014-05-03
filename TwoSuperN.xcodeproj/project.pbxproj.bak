@@ -20,8 +20,9 @@
 		B530545B18EA25BF00B2631D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B530543A18EA25BF00B2631D /* Foundation.framework */; };
 		B530545C18EA25BF00B2631D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B530543E18EA25BF00B2631D /* UIKit.framework */; };
 		B530546418EA25BF00B2631D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B530546218EA25BF00B2631D /* InfoPlist.strings */; };
+		B530546618EA25BF00B2631D /* KO4096Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = B530546518EA25BF00B2631D /* KO4096Tests.m */; };
 		B530547118EA2A7500B2631D /* BLBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = B530547018EA2A7500B2631D /* BLBoard.m */; };
-		B5621FD71915A84E00365F07 /* TwoSuperNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5621FD61915A84E00365F07 /* TwoSuperNTests.m */; };
+		B5CFC99119158D0C00C52F1C /* TwoSuperN-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5CFC98F19158D0C00C52F1C /* TwoSuperN-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +31,7 @@
 			containerPortal = B530542F18EA25BE00B2631D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = B530543618EA25BF00B2631D;
-			remoteInfo = TwoSuperN;
+			remoteInfo = KO4096;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -51,9 +52,9 @@
 		B530545918EA25BF00B2631D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		B530546118EA25BF00B2631D /* TwoSuperNTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwoSuperNTests-Info.plist"; sourceTree = "<group>"; };
 		B530546318EA25BF00B2631D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B530546518EA25BF00B2631D /* KO4096Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KO4096Tests.m; sourceTree = "<group>"; };
 		B530546F18EA2A7500B2631D /* BLBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLBoard.h; sourceTree = "<group>"; };
 		B530547018EA2A7500B2631D /* BLBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLBoard.m; sourceTree = "<group>"; };
-		B5621FD61915A84E00365F07 /* TwoSuperNTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoSuperNTests.m; sourceTree = "<group>"; };
 		B5CFC98F19158D0C00C52F1C /* TwoSuperN-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TwoSuperN-Info.plist"; sourceTree = "<group>"; };
 		B5CFC99019158D0C00C52F1C /* TwoSuperN-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TwoSuperN-Prefix.pch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -85,8 +86,8 @@
 		B530542E18EA25BE00B2631D = {
 			isa = PBXGroup;
 			children = (
-				B530544018EA25BF00B2631D /* TwoSuperN */,
-				B530545F18EA25BF00B2631D /* TwoSuperNTests */,
+				B530544018EA25BF00B2631D /* KO4096 */,
+				B530545F18EA25BF00B2631D /* KO4096Tests */,
 				B530543918EA25BF00B2631D /* Frameworks */,
 				B530543818EA25BF00B2631D /* Products */,
 			);
@@ -112,7 +113,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		B530544018EA25BF00B2631D /* TwoSuperN */ = {
+		B530544018EA25BF00B2631D /* KO4096 */ = {
 			isa = PBXGroup;
 			children = (
 				B530544918EA25BF00B2631D /* BLAppDelegate.h */,
@@ -125,7 +126,7 @@
 				B530546F18EA2A7500B2631D /* BLBoard.h */,
 				B530547018EA2A7500B2631D /* BLBoard.m */,
 			);
-			path = TwoSuperN;
+			path = KO4096;
 			sourceTree = "<group>";
 		};
 		B530544118EA25BF00B2631D /* Supporting Files */ = {
@@ -139,13 +140,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B530545F18EA25BF00B2631D /* TwoSuperNTests */ = {
+		B530545F18EA25BF00B2631D /* KO4096Tests */ = {
 			isa = PBXGroup;
 			children = (
-				B5621FD61915A84E00365F07 /* TwoSuperNTests.m */,
+				B530546518EA25BF00B2631D /* KO4096Tests.m */,
 				B530546018EA25BF00B2631D /* Supporting Files */,
 			);
-			path = TwoSuperNTests;
+			path = KO4096Tests;
 			sourceTree = "<group>";
 		};
 		B530546018EA25BF00B2631D /* Supporting Files */ = {
@@ -173,7 +174,7 @@
 			dependencies = (
 			);
 			name = TwoSuperN;
-			productName = TwoSuperN;
+			productName = KO4096;
 			productReference = B530543718EA25BF00B2631D /* TwoSuperN.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -191,7 +192,7 @@
 				B530545E18EA25BF00B2631D /* PBXTargetDependency */,
 			);
 			name = TwoSuperNTests;
-			productName = TwoSuperNTests;
+			productName = KO4096Tests;
 			productReference = B530545818EA25BF00B2631D /* TwoSuperNTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -236,6 +237,7 @@
 			files = (
 				B530545318EA25BF00B2631D /* Images.xcassets in Resources */,
 				B530544518EA25BF00B2631D /* InfoPlist.strings in Resources */,
+				B5CFC99119158D0C00C52F1C /* TwoSuperN-Info.plist in Resources */,
 				B530544E18EA25BF00B2631D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -266,7 +268,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5621FD71915A84E00365F07 /* TwoSuperNTests.m in Sources */,
+				B530546618EA25BF00B2631D /* KO4096Tests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,8 +386,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
-				INFOPLIST_FILE = "TwoSuperN/TwoSuperN-Info.plist";
+				GCC_PREFIX_HEADER = "KO4096/TwoSuperN-Prefix.pch";
+				INFOPLIST_FILE = "KO4096/KO4096-Info.plist";
 				PRODUCT_NAME = TwoSuperN;
 				WRAPPER_EXTENSION = app;
 			};
@@ -397,8 +399,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
-				INFOPLIST_FILE = "TwoSuperN/TwoSuperN-Info.plist";
+				GCC_PREFIX_HEADER = "KO4096/TwoSuperN-Prefix.pch";
+				INFOPLIST_FILE = "KO4096/KO4096-Info.plist";
 				PRODUCT_NAME = TwoSuperN;
 				WRAPPER_EXTENSION = app;
 			};
@@ -407,19 +409,19 @@
 		B530546D18EA25BF00B2631D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TwoSuperN.app/TwoSuperN";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/KO4096.app/KO4096";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
+				GCC_PREFIX_HEADER = "KO4096/KO4096-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "TwoSuperNTests/TwoSuperNTests-Info.plist";
+				INFOPLIST_FILE = "KO4096Tests/TwoSuperNTests-Info.plist";
 				PRODUCT_NAME = TwoSuperNTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -429,15 +431,15 @@
 		B530546E18EA25BF00B2631D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TwoSuperN.app/TwoSuperN";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/KO4096.app/KO4096";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
-				INFOPLIST_FILE = "TwoSuperNTests/TwoSuperNTests-Info.plist";
+				GCC_PREFIX_HEADER = "KO4096/KO4096-Prefix.pch";
+				INFOPLIST_FILE = "KO4096Tests/TwoSuperNTests-Info.plist";
 				PRODUCT_NAME = TwoSuperNTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

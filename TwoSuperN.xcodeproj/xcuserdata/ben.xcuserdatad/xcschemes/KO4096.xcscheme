@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B530543618EA25BF00B2631D"
-               BuildableName = "KO4096.app"
+               BuildableName = "TwoSuperN.app"
                BlueprintName = "TwoSuperN"
                ReferencedContainer = "container:TwoSuperN.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B530545718EA25BF00B2631D"
-               BuildableName = "KO4096Tests.xctest"
+               BuildableName = "TwoSuperNTests.xctest"
                BlueprintName = "TwoSuperNTests"
                ReferencedContainer = "container:TwoSuperN.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B530543618EA25BF00B2631D"
-            BuildableName = "KO4096.app"
+            BuildableName = "TwoSuperN.app"
             BlueprintName = "TwoSuperN"
             ReferencedContainer = "container:TwoSuperN.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B530543618EA25BF00B2631D"
-            BuildableName = "KO4096.app"
+            BuildableName = "TwoSuperN.app"
             BlueprintName = "TwoSuperN"
             ReferencedContainer = "container:TwoSuperN.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B530543618EA25BF00B2631D"
-            BuildableName = "KO4096.app"
+            BuildableName = "TwoSuperN.app"
             BlueprintName = "TwoSuperN"
             ReferencedContainer = "container:TwoSuperN.xcodeproj">
          </BuildableReference>
