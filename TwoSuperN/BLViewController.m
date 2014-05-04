@@ -16,7 +16,7 @@
 
 @implementation BLViewController
 
-@synthesize score=m_scoreLbl, highScore=m_highScoreLbl;
+@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, arrow=m_arrow, gameOverLbl=m_gameOverLbl;
 
 -(void) removeActiveTile:(UIView *)tile {
     [m_activeTiles removeObject:tile];
@@ -45,7 +45,7 @@
                 [toTile removeFromSuperview];
                 [weakSelf removeActiveTile: fromTile];
                 [weakSelf removeActiveTile: toTile];
-                NSLog(@"Merge (%.0f,%.0f) -> (%.0f,%.0f) = %d", source.x,source.y,target.x,target.y, val);
+                LDBUG(@"Merge (%.0f,%.0f) -> (%.0f,%.0f) = %d", source.x,source.y,target.x,target.y, val);
                 if (completion != nil) {
                     completion();
                 }
@@ -65,7 +65,7 @@
         [UIView animateWithDuration:0.1 animations:^{
             fromTile.frame = CGRectMake(toLoc.frame.origin.x, toLoc.frame.origin.y, toLoc.frame.size.width, toLoc.frame.size.height);
         } completion:^(BOOL finished) {
-            NSLog(@"Move (%.0f,%.0f) -> (%.0f,%.0f)", source.x,source.y,target.x,target.y);
+            LDBUG(@"Move (%.0f,%.0f) -> (%.0f,%.0f)", source.x,source.y,target.x,target.y);
             if (completion != nil) {
                 completion();
             }
@@ -105,7 +105,7 @@
             tile.alpha = 1.0;
             tile.transform = CGAffineTransformIdentity;
         } completion:^(BOOL finished) {
-            NSLog(@"%d placed at (%.0f,%.0f)", val, location.x, location.y);
+            LDBUG(@"%d placed at (%.0f,%.0f)", val, location.x, location.y);
             if (completion != nil) {
                 completion();
             }
@@ -114,23 +114,17 @@
 }
 
 -(void) onGameOver {
-    UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Game Over" message:@"Game is over, try again!" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Start New Game", nil];
-    [av show];
+    [UIView animateWithDuration:0.5 animations:^{
+        m_gameOverLbl.alpha = 1.0;
+    }];
 }
-
-// Called when a button is clicked. The view will be automatically dismissed after this call returns
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    [self startGame];
-}
-
 
 -(void) onScoreUpdate:(int) score {
-    NSLog(@"score is now %d", score);
+    LDBUG(@"score is now %d", score);
     
     m_scoreLbl.text = [NSString stringWithFormat:@"%d", score];
     if (m_highScore < score) {
         m_highScore = score;
-        NSLog(@"HIGSCORE CHANGE! %d", score);
         m_highScoreLbl.text = [NSString stringWithFormat:@"%d", score];
         NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
         [def setInteger:score forKey:@"highscore"];
@@ -162,6 +156,10 @@
     for(UIGestureRecognizer *recognizer in self.view.gestureRecognizers) {
         recognizer.enabled = YES;
     }
+    
+    if (m_completion != nil) {
+        m_completion();
+    }
 }
 
 -(void) onMoveComplete {
@@ -171,12 +169,21 @@
     for (int i = 0; i < [m_animationQueue count]; i++) {
         for (int j = 0; j < [m_animationQueue[i] count]; j++) {
             void(^animation)(void(^completion)(void)) = m_animationQueue[i][j];
-            animation(nil);
+            if (i == [m_animationQueue count] - 1 && j == [m_animationQueue[i] count] - 1) {
+                animation(^() {
+                    [self startListeningToTouchEvents];
+                });
+            } else {
+                animation(nil);
+            }
         }
     }
     
+    if ([m_animationQueue count] == 0) {
+        [self startListeningToTouchEvents];
+    }
+    
     [m_animationQueue removeAllObjects];
-    [self startListeningToTouchEvents];
 }
 
 -(UILabel *) getTileAt:(int)pos Val:(int)val {
@@ -202,10 +209,12 @@
 -(void) startGame {
     m_board = [BLBoard new];
     m_board.listener = self;
+    m_completion = nil;
 
     // zero out the score on the screen
     [self onScoreUpdate:0];
     
+    m_gameOverLbl.alpha = 0;
     [self drawBoard];
 }
 
@@ -239,18 +248,21 @@ UIColor* rgba(int r, int g, int b, int a) {
         @"4096":[self.view viewWithTag:4096]
     };
     
-    ((UILabel *)m_tiles[@"2"]).backgroundColor = rgba(9, 108, 31,1);
-    ((UILabel *)m_tiles[@"4"]).backgroundColor = rgba( 54, 159, 77,1);
-    ((UILabel *)m_tiles[@"8"]).backgroundColor = rgba(135, 212, 152,1);
-    ((UILabel *)m_tiles[@"16"]).backgroundColor = rgba(131, 156, 195,1);
-    ((UILabel *)m_tiles[@"32"]).backgroundColor = rgba(55, 88, 139,1);
-    ((UILabel *)m_tiles[@"64"]).backgroundColor = rgba(16, 47, 95,1);
-    ((UILabel *)m_tiles[@"128"]).backgroundColor = rgba( 143, 96, 12,1);
-    ((UILabel *)m_tiles[@"256"]).backgroundColor = rgba( 211, 160, 71,1);
-    ((UILabel *)m_tiles[@"512"]).backgroundColor = rgba( 255, 222, 163,1);
-    ((UILabel *)m_tiles[@"1024"]).backgroundColor = rgba( 255, 172, 163,1);
-    ((UILabel *)m_tiles[@"2048"]).backgroundColor = rgba( 211, 84, 71,1);
-    ((UILabel *)m_tiles[@"4096"]).backgroundColor = rgba( 143, 25, 12,1);
+    ((UILabel *)m_tiles[@"2"]).backgroundColor = rgba(163,232,163,1);
+    ((UILabel *)m_tiles[@"4"]).backgroundColor = rgba( 75,190, 75,1);
+    ((UILabel *)m_tiles[@"8"]).backgroundColor = rgba( 45,168, 45,1);
+    
+    ((UILabel *)m_tiles[@"16"]).backgroundColor = rgba(147,209,209,1);
+    ((UILabel *)m_tiles[@"32"]).backgroundColor = rgba( 56,143,143,1);
+    ((UILabel *)m_tiles[@"64"]).backgroundColor = rgba( 16,103,103,1);
+    
+    ((UILabel *)m_tiles[@"128"]).backgroundColor = rgba(255,214,179,1);
+    ((UILabel *)m_tiles[@"256"]).backgroundColor = rgba(238,159, 94,1);
+    ((UILabel *)m_tiles[@"512"]).backgroundColor = rgba(210,126, 57,1);
+    
+    ((UILabel *)m_tiles[@"1024"]).backgroundColor = rgba(255,179,179,1);
+    ((UILabel *)m_tiles[@"2048"]).backgroundColor = rgba(238, 94, 94,1);
+    ((UILabel *)m_tiles[@"4096"]).backgroundColor = rgba(210, 57, 57,1);
     
     for (UIView *tile in [m_tiles allValues]) {
         tile.hidden = YES;
@@ -296,20 +308,70 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 -(IBAction)swipeUp:(id)sender {
-    NSLog(@"swipe up");
     [m_board shiftUp];
 }
+
 -(IBAction)swipeDown:(id)sender {
-    NSLog(@"swipe down");
     [m_board shiftDown];
 }
+
 -(IBAction)swipeLeft:(id)sender {
-    NSLog(@"swipe left");
     [m_board shiftLeft];
 }
--(IBAction)swipeRight:(id)sender {
-    NSLog(@"swipe right");
+
+-(void)swipeRight:(id)sender {
     [m_board shiftRight];
+}
+
+-(IBAction)restart:(id)sender {
+    [self startGame];
+}
+
+-(IBAction)suggestAMove:(id)sender {
+    if (m_board.isGameOver) {
+        // do nothing if the game is over
+        return;
+    }
+    NSString *move = [m_board suggestAMove];
+    UIImage *arrow = [UIImage imageNamed:move];
+    [self.view bringSubviewToFront:m_arrow];
+    
+    [m_arrow setImage:arrow];
+    m_arrow.alpha = 0.25;
+    m_arrow.transform = CGAffineTransformMakeScale(0.75, 0.75);
+    
+    [UIView animateWithDuration:0.5 delay:0 options:0 animations:^{
+        m_arrow.transform = CGAffineTransformIdentity;
+        m_arrow.alpha = 0.75;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.25 animations:^{
+            m_arrow.alpha = 0;
+        } completion:^(BOOL finished) {
+        }];
+    }];
+}
+
+-(IBAction)playForMe:(id)sender {
+    NSString *move = [m_board suggestAMove];
+
+    __weak BLViewController *wself = self;
+    m_completion = ^() {
+        [wself playForMe:sender];
+    };
+    
+    if (!m_board.isGameOver) {
+        if ([move isEqualToString:@"up"]) {
+            [self swipeUp:sender];
+        } else if ([move isEqualToString:@"down"]) {
+            [self swipeDown:sender];
+        } else if ([move isEqualToString:@"left"]) {
+            [self swipeLeft:sender];
+        } else if ([move isEqualToString:@"right"]) {
+            [self swipeRight:sender];
+        }
+    } else {
+        m_completion = nil;
+    }
 }
 
 

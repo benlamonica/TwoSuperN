@@ -26,14 +26,23 @@ typedef struct {
     UILabel *m_scoreLbl;
     UILabel *m_highScoreLbl;
     long m_highScore;
+    UIButton *m_restartBtn;
+    UILabel *m_gameOverLbl;
+    UIImageView *m_arrow;
+    void (^m_completion)();
 }
 
 -(IBAction)swipeUp:(id)sender;
 -(IBAction)swipeDown:(id)sender;
 -(IBAction)swipeLeft:(id)sender;
 -(IBAction)swipeRight:(id)sender;
+-(IBAction)restart:(id)sender;
+-(IBAction)suggestAMove:(id)sender;
+-(IBAction)playForMe:(id)sender;
 
 @property IBOutlet UILabel *score;
 @property IBOutlet UILabel *highScore;
+@property IBOutlet UILabel *gameOverLbl;
+@property IBOutlet UIImageView *arrow;
 
 @end

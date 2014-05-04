@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BLLogging.h"
 
 @protocol BLBoardEventListener
 -(void) onMergeFrom:(CGPoint)source To:(CGPoint)target Val:(int) val;
@@ -25,8 +26,16 @@
     int m_board[BOARD_WIDTH][BOARD_WIDTH];
     int m_spacesFree;
     int m_score;
+    BOOL m_isGameOver;
     id<BLBoardEventListener> m_listener;
 }
+
+typedef enum {
+    MOVE_UP,
+    MOVE_DOWN,
+    MOVE_LEFT,
+    MOVE_RIGHT
+} MOVE;
 
 -(NSArray *) columns;
 -(NSArray *) rows;
@@ -37,7 +46,9 @@
 -(void) shiftLeft;
 -(void) addDigit;
 -(void) startOver;
+-(NSString *) suggestAMove;
 
 @property int score;
+@property BOOL isGameOver;
 @property id<BLBoardEventListener> listener;
 @end

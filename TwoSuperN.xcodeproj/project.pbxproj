@@ -54,6 +54,7 @@
 		B530546F18EA2A7500B2631D /* BLBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLBoard.h; sourceTree = "<group>"; };
 		B530547018EA2A7500B2631D /* BLBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLBoard.m; sourceTree = "<group>"; };
 		B5621FD61915A84E00365F07 /* TwoSuperNTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoSuperNTests.m; sourceTree = "<group>"; };
+		B5621FD81915EA9C00365F07 /* BLLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLLogging.h; sourceTree = "<group>"; };
 		B5CFC98F19158D0C00C52F1C /* TwoSuperN-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TwoSuperN-Info.plist"; sourceTree = "<group>"; };
 		B5CFC99019158D0C00C52F1C /* TwoSuperN-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TwoSuperN-Prefix.pch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -124,6 +125,7 @@
 				B530544118EA25BF00B2631D /* Supporting Files */,
 				B530546F18EA2A7500B2631D /* BLBoard.h */,
 				B530547018EA2A7500B2631D /* BLBoard.m */,
+				B5621FD81915EA9C00365F07 /* BLLogging.h */,
 			);
 			path = TwoSuperN;
 			sourceTree = "<group>";
@@ -383,10 +385,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
 				INFOPLIST_FILE = "TwoSuperN/TwoSuperN-Info.plist";
 				PRODUCT_NAME = TwoSuperN;
+				PROVISIONING_PROFILE = "D777438E-32A7-4FCD-B067-33BDC0B4958C";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -396,10 +400,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
 				INFOPLIST_FILE = "TwoSuperN/TwoSuperN-Info.plist";
 				PRODUCT_NAME = TwoSuperN;
+				PROVISIONING_PROFILE = "D777438E-32A7-4FCD-B067-33BDC0B4958C";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

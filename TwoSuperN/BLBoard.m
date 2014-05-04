@@ -15,7 +15,7 @@
 
 @implementation BLBoard
 
-@synthesize score = m_score, listener = m_listener;
+@synthesize score = m_score, listener = m_listener, isGameOver = m_isGameOver;
 
 // -=-=-=-=-=-=-= Helper Functions -=-=-=-=-=-=-=-=-=-
 
@@ -23,7 +23,7 @@ BOOL (^consolidatePiece)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *,
 ^(int board[BOARD_WIDTH][BOARD_WIDTH], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
     int *source = &board[(int)from.x][(int)from.y];
     int *target = &board[(int)to.x][(int)to.y];
-    if (*target != 0 && *target == *source) {
+    if (*target != 0 && *target == *source && *target < 4096) { // don't merge peices larger than 2048
         // multiply the source by 2, that way we don't combine all the way down the line
         *source *= 2;
         *target *= 0;
@@ -185,15 +185,15 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
     shifted |= shiftAction(m_board, NO, movePiece, &m_score, m_listener) != 0;
     [m_listener onChangesComplete];
     
-    NSLog(@"Num merged: %d", numMerged);
+    LDBUG(@"Num merged: %d", numMerged);
     m_spacesFree += numMerged;
-    NSLog(@"Spaces free: %d", m_spacesFree);
+    LDBUG(@"Spaces free: %d", m_spacesFree);
     
     if (shifted) {
         [self addDigit];
     }
     
-    NSLog(@"\nBefore: \n%@\nAfter: \n%@\n", before, [self description]);
+    LDBUG(@"\nBefore: \n%@\nAfter: \n%@\n", before, [self description]);
     [m_listener onMoveComplete];
 }
 
@@ -213,7 +213,7 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
     [self shift:shiftLeft];
 }
 
--(BOOL) isGameOver {
+-(BOOL) checkIfGameIsOver {
     int tempBoard[BOARD_WIDTH][BOARD_WIDTH];
     int score = 0;
     memcpy(tempBoard, m_board, sizeof(tempBoard));
@@ -228,6 +228,8 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
     shifted |= shiftRight(tempBoard, NO, movePiece, &score, nil) != 0;
     shifted |= shiftRight(tempBoard, YES, consolidatePiece, &score, nil) != 0;
 
+    m_isGameOver = !shifted;
+    
     return !shifted;
 }
 
@@ -256,9 +258,9 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
         }
     }
     
-    NSLog(@"spacesFree: %d", m_spacesFree);
+    LDBUG(@"spacesFree: %d", m_spacesFree);
 
-    if (m_spacesFree == 0 && [self isGameOver]) {
+    if (m_spacesFree == 0 && [self checkIfGameIsOver]) {
         [m_listener onGameOver];
     }
 }
@@ -272,6 +274,7 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
 }
 
 -(void) startOver {
+    m_isGameOver = NO;
     for (int x = 0; x < BOARD_WIDTH; x++) {
         for (int y = 0; y < BOARD_WIDTH; y++) {
             m_board[x][y] = 0;
@@ -304,6 +307,68 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
     }
     
     return a;
+}
+
+-(NSString *) suggestAMove {
+    int tempBoard[BOARD_WIDTH][BOARD_WIDTH];
+    int highScore = 0, downScore = 0, leftScore = 0, rightScore = 0;
+    BOOL moved = NO;
+    NSString *suggestedMove = @"up";
+    
+    memcpy(tempBoard, m_board, sizeof(tempBoard));
+    // check to see if any of them would move should we try to go in any of these directions
+    moved |= shiftUp(tempBoard, NO, movePiece, &highScore, nil) != 0;
+    moved |= shiftUp(tempBoard, YES, consolidatePiece, &highScore, nil) != 0;
+    
+    if (moved) {
+        highScore++; // increment score, so that if we moved, we know this is a valid suggestion
+        moved = NO;
+    }
+
+    
+    memcpy(tempBoard, m_board, sizeof(tempBoard));
+    moved |= shiftDown(tempBoard, NO, movePiece, &downScore, nil) != 0;
+    moved |= shiftDown(tempBoard, YES, consolidatePiece, &downScore, nil) != 0;
+
+    if (moved) {
+        downScore++; // increment score, so that if we moved, we know this is a valid suggestion
+        moved = NO;
+    }
+
+    if (downScore > highScore) {
+        suggestedMove = @"down";
+        highScore = downScore;
+    }
+    
+    memcpy(tempBoard, m_board, sizeof(tempBoard));
+    moved |= shiftLeft(tempBoard, NO, movePiece, &leftScore, nil) != 0;
+    moved |= shiftLeft(tempBoard, YES, consolidatePiece, &leftScore, nil) != 0;
+    
+    if (moved) {
+        leftScore++; // increment score, so that if we moved, we know this is a valid suggestion
+        moved = NO;
+    }
+    
+    if (leftScore > highScore) {
+        suggestedMove = @"left";
+        highScore = leftScore;
+    }
+    
+    memcpy(tempBoard, m_board, sizeof(tempBoard));
+    moved |= shiftRight(tempBoard, NO, movePiece, &rightScore, nil) != 0;
+    moved |= shiftRight(tempBoard, YES, consolidatePiece, &rightScore, nil) != 0;
+
+    if (moved) {
+        rightScore++; // increment score, so that if we moved, we know this is a valid suggestion
+    }
+
+    if (rightScore > highScore) {
+        suggestedMove = @"right";
+        highScore = rightScore;
+    }
+    
+    LDBUG(@"Suggesting %@, highest score was %d", suggestedMove, highScore);
+    return suggestedMove;
 }
 
 @end
