@@ -7,7 +7,6 @@
 //
 
 #import "BLViewController.h"
-#import <dispatch/semaphore.h>
 
 @interface BLViewController ()
 -(UILabel *) getTileAt:(int)pos Val:(int)val;
