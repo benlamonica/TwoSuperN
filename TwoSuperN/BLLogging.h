@@ -16,6 +16,11 @@
 #define LWARN(str,n...) if(DBG_LVL <= 3) NSLog([NSString stringWithFormat:@"[WARN] %@", str],n)
 #define LCRIT(str,n...) if(DBG_LVL <= 4) NSLog([NSString stringWithFormat:@"[CRIT] %@", str],n)
 
+#define DBUG_ENABLED (DBG_LVL <= 1)
+#define INFO_ENABLED (DBG_LVL <= 2)
+#define WARN_ENABLED (DBG_LVL <= 3)
+#define CRIT_ENABLED (DBG_LVL <= 4)
+
 #ifndef bl_dispatch_after
 #define bl_dispatch_after(delayInSeconds, block) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), block)
 #endif

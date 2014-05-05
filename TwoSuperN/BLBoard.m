@@ -10,7 +10,9 @@
 
 // Private Methods
 @interface BLBoard ()
--(void) shift:(int(^)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction;
+typedef BOOL (^Action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>);
+typedef int(^ShiftAction)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, Action, int *score, id<BLBoardEventListener>);
+-(void) shift:(ShiftAction)shiftAction;
 @end
 
 @implementation BLBoard
@@ -19,7 +21,7 @@
 
 // -=-=-=-=-=-=-= Helper Functions -=-=-=-=-=-=-=-=-=-
 
-BOOL (^consolidatePiece)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
+Action consolidatePiece =
 ^(int board[BOARD_WIDTH][BOARD_WIDTH], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
     int *source = &board[(int)from.x][(int)from.y];
     int *target = &board[(int)to.x][(int)to.y];
@@ -35,7 +37,7 @@ BOOL (^consolidatePiece)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *,
     return NO;
 };
 
-BOOL (^movePiece)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>) =
+Action movePiece =
 ^(int board[BOARD_WIDTH][BOARD_WIDTH], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
     int *source = &board[(int)from.x][(int)from.y];
     int *target = &board[(int)to.x][(int)to.y];
@@ -49,8 +51,8 @@ BOOL (^movePiece)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLB
     return NO;
 };
 
-int (^shiftUp)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+ShiftAction shiftUp =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int x = 0; x < 4; x++) {
         for (int y = 1; y < 4; y++) {
@@ -76,8 +78,8 @@ int (^shiftUp)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOA
     return changed;
 };
 
-int (^shiftDown)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+ShiftAction shiftDown =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int x = 0; x < 4; x++) {
         for (int y = 2; y >= 0; y--) {
@@ -103,8 +105,8 @@ int (^shiftDown)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
     return changed;
 };
 
-int (^shiftRight)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *, id<BLBoardEventListener>) =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+ShiftAction shiftRight =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int y = 0; y < BOARD_WIDTH; y++) {
         for (int x = 2; x >= 0; x--) {
@@ -131,8 +133,8 @@ int (^shiftRight)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][
     return changed;
 };
 
-int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>) =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, BOOL(^action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *score, id<BLBoardEventListener>), int *score, id<BLBoardEventListener> listener) {
+ShiftAction shiftLeft =
+^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
     int changed = 0;
     for (int y = 0; y < BOARD_WIDTH; y++) {
         for (int x = 1; x < BOARD_WIDTH; x++) {
@@ -174,22 +176,36 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
     return self;
 }
 
--(void) shift:(int(^)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>), int *score, id<BLBoardEventListener>))shiftAction {
++(int) performMove:(ShiftAction)action board:(int[BOARD_WIDTH][BOARD_WIDTH])board score:(int *)score listener:(id<BLBoardEventListener>)listener {
     BOOL shifted = NO;
     int numMerged = 0;
-    NSString *before = [self description];
-    shifted |= shiftAction(m_board, NO, movePiece, &m_score, m_listener) != 0;
-    [m_listener onChangesComplete];
-    shifted |= (numMerged = shiftAction(m_board, YES, consolidatePiece, &m_score, m_listener)) != 0;
-    [m_listener onChangesComplete];
-    shifted |= shiftAction(m_board, NO, movePiece, &m_score, m_listener) != 0;
-    [m_listener onChangesComplete];
-    
-    LDBUG(@"Num merged: %d", numMerged);
-    m_spacesFree += numMerged;
-    LDBUG(@"Spaces free: %d", m_spacesFree);
-    
-    if (shifted) {
+    shifted |= action(board, NO, movePiece, score, listener) != 0;
+    [listener onChangesComplete];
+    shifted |= (numMerged = action(board, YES, consolidatePiece, score, listener)) != 0;
+    [listener onChangesComplete];
+    shifted |= action(board, NO, movePiece, score, listener) != 0;
+    [listener onChangesComplete];
+
+    if (!shifted) {
+        return -1;
+    } else {
+        return numMerged;
+    }
+}
+
+-(void) shift:(ShiftAction)shiftAction {
+    int numMerged = 0;
+    NSString *before = nil;
+
+    if (DBUG_ENABLED) {
+        before = [self description];
+    }
+
+    numMerged = [BLBoard performMove:shiftAction board:m_board score:&m_score listener:m_listener];
+    if (numMerged > -1) {
+        LDBUG(@"Num merged: %d", numMerged);
+        m_spacesFree += numMerged;
+        LDBUG(@"Spaces free: %d", m_spacesFree);
         [self addDigit];
     }
     
@@ -233,31 +249,37 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
     return !shifted;
 }
 
--(void) addDigit {
-    BOOL digitPlaced = NO;
+CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
     int pos = arc4random_uniform(16);
     int num = arc4random_uniform(2);
-    while (!digitPlaced && m_spacesFree > 0) {
+    int timesAround = 0;
+    while (timesAround < 2) {
         int x = pos / BOARD_WIDTH;
         int y = pos % BOARD_WIDTH;
-        if (m_board[x][y] == 0) {
+        if (board[x][y] == 0) {
             if (num == 0) {
-                m_board[x][y] = 2;
+                board[x][y] = 2;
             } else {
-                m_board[x][y] = 4;
+                board[x][y] = 4;
             }
-
-            [m_listener onNumberAdded:CGPointMake(x,y) Val:m_board[x][y]];
-            digitPlaced = YES;
-            m_spacesFree--;
+            
+            return CGPointMake(x,y);
         } else {
             pos++;
             if (pos > 15) {
                 pos = 0;
+                timesAround++;
             }
         }
     }
     
+    return CGPointMake(-1,-1);
+}
+
+-(void) addDigit {
+    CGPoint addedAt = addDigit(m_board);
+    [m_listener onNumberAdded:addedAt Val:m_board[(int)addedAt.x][(int)addedAt.y]];
+    m_spacesFree--;
     LDBUG(@"spacesFree: %d", m_spacesFree);
 
     if (m_spacesFree == 0 && [self checkIfGameIsOver]) {
@@ -310,65 +332,78 @@ int (^shiftLeft)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, BOOL(^)(int[BOARD_WIDTH][B
 }
 
 -(NSString *) suggestAMove {
+    NSArray *currentHighScoreMove;
+    int currentHighScore = -1;
+    static NSString* MOVES[4] = {@"up",@"down",@"left",@"right"};
+
+    @autoreleasepool {
+        int lookahead = 2;
+        int *counters = malloc(sizeof(int)*lookahead);
+        for (int i = 0; i < lookahead; i++) {
+            counters[i] = 0;
+        }
+        
+        while (counters[lookahead - 1] < 3) {
+            NSMutableArray *moves = [NSMutableArray new];
+            for (int i = 0; i < lookahead; i++) {
+                [moves addObject:MOVES[counters[i]]];
+            }
+            
+            BOOL incremented = NO;
+            for (int i = 0; i < (lookahead - 1); i++) {
+                if (counters[i] > counters[i+1]) {
+                    counters[i+1]++;
+                    incremented = YES;
+                    break;
+                }
+            }
+            if (!incremented) {
+                counters[0]++;
+            }
+            
+            int score = [self scoreAMove:moves];
+            if (score > currentHighScore) {
+                currentHighScore = score;
+                currentHighScoreMove = moves;
+            }
+        }
+        free(counters);
+        counters = NULL;
+    }
+    
+    return currentHighScoreMove[0];
+}
+
+-(int) scoreAMove:(NSArray *)directions {
     int tempBoard[BOARD_WIDTH][BOARD_WIDTH];
-    int highScore = 0, downScore = 0, leftScore = 0, rightScore = 0;
-    BOOL moved = NO;
-    NSString *suggestedMove = @"up";
+    int score = 0;
+    ShiftAction direction;
+    BOOL shifted = NO;
+    
     
     memcpy(tempBoard, m_board, sizeof(tempBoard));
-    // check to see if any of them would move should we try to go in any of these directions
-    moved |= shiftUp(tempBoard, NO, movePiece, &highScore, nil) != 0;
-    moved |= shiftUp(tempBoard, YES, consolidatePiece, &highScore, nil) != 0;
-    
-    if (moved) {
-        highScore++; // increment score, so that if we moved, we know this is a valid suggestion
-        moved = NO;
-    }
-
-    
-    memcpy(tempBoard, m_board, sizeof(tempBoard));
-    moved |= shiftDown(tempBoard, NO, movePiece, &downScore, nil) != 0;
-    moved |= shiftDown(tempBoard, YES, consolidatePiece, &downScore, nil) != 0;
-
-    if (moved) {
-        downScore++; // increment score, so that if we moved, we know this is a valid suggestion
-        moved = NO;
-    }
-
-    if (downScore > highScore) {
-        suggestedMove = @"down";
-        highScore = downScore;
+    for (NSString *dir in directions) {
+        if ([dir isEqualToString:@"up"]) {
+            direction = shiftUp;
+        } else if ([dir isEqualToString:@"down"]) {
+            direction = shiftDown;
+        } else if ([dir isEqualToString:@"left"]) {
+            direction = shiftLeft;
+        } else if ([dir isEqualToString:@"right"]) {
+            direction = shiftRight;
+        }
+        
+        if ([BLBoard performMove:direction board:tempBoard score:&score listener:nil] > -1) {
+            shifted |= YES;
+            addDigit(tempBoard);
+        }
     }
     
-    memcpy(tempBoard, m_board, sizeof(tempBoard));
-    moved |= shiftLeft(tempBoard, NO, movePiece, &leftScore, nil) != 0;
-    moved |= shiftLeft(tempBoard, YES, consolidatePiece, &leftScore, nil) != 0;
-    
-    if (moved) {
-        leftScore++; // increment score, so that if we moved, we know this is a valid suggestion
-        moved = NO;
+    if (!shifted) {
+        return -1;
+    } else {
+        return score;
     }
-    
-    if (leftScore > highScore) {
-        suggestedMove = @"left";
-        highScore = leftScore;
-    }
-    
-    memcpy(tempBoard, m_board, sizeof(tempBoard));
-    moved |= shiftRight(tempBoard, NO, movePiece, &rightScore, nil) != 0;
-    moved |= shiftRight(tempBoard, YES, consolidatePiece, &rightScore, nil) != 0;
-
-    if (moved) {
-        rightScore++; // increment score, so that if we moved, we know this is a valid suggestion
-    }
-
-    if (rightScore > highScore) {
-        suggestedMove = @"right";
-        highScore = rightScore;
-    }
-    
-    LDBUG(@"Suggesting %@, highest score was %d", suggestedMove, highScore);
-    return suggestedMove;
 }
 
 @end

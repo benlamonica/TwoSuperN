@@ -355,7 +355,7 @@ UIColor* rgba(int r, int g, int b, int a) {
 
     __weak BLViewController *wself = self;
     m_completion = ^() {
-        [wself playForMe:sender];
+        [wself performSelectorOnMainThread:@selector(playForMe:) withObject:sender waitUntilDone:NO];
     };
     
     if (!m_board.isGameOver) {
