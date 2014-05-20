@@ -12,6 +12,7 @@
 typedef struct {
     CGPoint source;
     CGPoint target;
+    int val;
     BOOL isInitialized;
 } BLMove;
 
@@ -21,15 +22,18 @@ typedef struct {
     NSDictionary *m_tiles;
     NSMutableArray *m_activeTiles;
     BLMove m_lastMove;
-    NSMutableArray *m_animationTempQueue;
     NSMutableArray *m_animationQueue;
     UILabel *m_scoreLbl;
     UILabel *m_highScoreLbl;
     long m_highScore;
     UIButton *m_restartBtn;
+    UIButton *m_suggestBtn;
+    UIButton *m_demoBtn;
     UILabel *m_gameOverLbl;
     UIImageView *m_arrow;
+    UILabel *m_suggestLbl;
     void (^m_completion)();
+    BOOL m_isInDemoMode;
 }
 
 -(IBAction)swipeUp:(id)sender;
@@ -37,12 +41,15 @@ typedef struct {
 -(IBAction)swipeLeft:(id)sender;
 -(IBAction)swipeRight:(id)sender;
 -(IBAction)restart:(id)sender;
--(IBAction)suggestAMove:(id)sender;
+-(IBAction)suggestMove:(id)sender;
 -(IBAction)playForMe:(id)sender;
 
 @property IBOutlet UILabel *score;
 @property IBOutlet UILabel *highScore;
 @property IBOutlet UILabel *gameOverLbl;
 @property IBOutlet UIImageView *arrow;
+@property IBOutlet UILabel *suggestLbl;
+@property IBOutlet UIButton *suggestBtn;
+@property IBOutlet UIButton *demoBtn;
 
 @end

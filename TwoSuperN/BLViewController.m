@@ -15,25 +15,31 @@
 
 @implementation BLViewController
 
-@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, arrow=m_arrow, gameOverLbl=m_gameOverLbl;
+@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, arrow=m_arrow, gameOverLbl=m_gameOverLbl, suggestLbl=m_suggestLbl, suggestBtn=m_suggestBtn, demoBtn=m_demoBtn;
+
 
 -(void) removeActiveTile:(UIView *)tile {
     [m_activeTiles removeObject:tile];
 }
 
--(void) onMergeFrom:(CGPoint)source To:(CGPoint)target Val:(int) val {
+-(void) animateMergeFrom:(CGPoint)source To:(CGPoint)target Final:(CGPoint)final Val:(int)val {
     __weak id weakView = self.view;
     __weak id weakSelf = self;
-    [m_animationTempQueue addObject:^(void(^completion)(void)){
-        int fromTag = target.y * 4 + target.x + 200;
-        int toTag = source.y * 4 + source.x + 200;
+    [m_animationQueue addObject:^(void(^completion)(void)){
+        int fromTag = source.y * 4 + source.x + 200;
+        int toTag = target.y * 4 + target.x + 200;
+        int finalTag = final.y * 4 + final.x + 100;
         UIView *fromTile = [weakView viewWithTag:fromTag];
         UIView *toTile = [weakView viewWithTag:toTag];
-        UIView *newTile = [weakSelf getTileAt:toTag-100 Val:val];
+        UIView *newTile = [weakSelf getTileAt:finalTag Val:val];
+        // change the tag to prevent the tile from being grabbed again
+        fromTile.tag = -1;
+        toTile.tag = -1;
         newTile.alpha = 0;
         [weakView addSubview:newTile];
         [UIView animateWithDuration:0.1 animations:^{
-            fromTile.frame = toTile.frame;
+            fromTile.frame = newTile.frame;
+            toTile.frame = newTile.frame;
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:0.1 animations:^{
                 fromTile.alpha = 0;
@@ -53,9 +59,13 @@
     }];
 }
 
+-(void) onMergeFrom:(CGPoint)source To:(CGPoint)target Final:(CGPoint)final Val:(int) val {
+    [self animateMergeFrom:source To:target Final:final Val:val];
+}
+
 -(void) animatePieceFrom:(CGPoint)source To:(CGPoint)target {
     __weak id weakView = self.view;
-    [m_animationTempQueue addObject:^(void(^completion)(void)) {
+    [m_animationQueue addObject:^(void(^completion)(void)) {
         int fromTag = source.y * 4 + source.x + 200;
         int toTag = target.y * 4 + target.x + 100;
         UIView *fromTile = [weakView viewWithTag:fromTag];
@@ -73,28 +83,13 @@
 }
 
 -(void) onMoveFrom:(CGPoint)source To:(CGPoint)target {
-    if (m_lastMove.isInitialized) {
-        if (m_lastMove.target.x == source.x && m_lastMove.target.y == source.y) {
-            // same piece is being moved, consolidate.
-            m_lastMove.target = target;
-        } else {
-            // new piece is being moved, so go ahead and animate this one.
-            [self animatePieceFrom:m_lastMove.source To:m_lastMove.target];
-            m_lastMove.source = source;
-            m_lastMove.target = target;
-            m_lastMove.isInitialized = YES; // clear out initialized flag, so that we will work on a new piece
-        }
-    } else {
-        m_lastMove.source = source;
-        m_lastMove.target = target;
-        m_lastMove.isInitialized = YES;
-    }
+    [self animatePieceFrom:source To:target];
 }
 
 -(void) onNumberAdded:(CGPoint)location Val:(int) val {
     __weak id weakView = self.view;
     __weak id weakSelf = self;
-    [m_animationQueue addObject:@[^(void(^completion)(void)) {
+    [m_animationQueue addObject:^(void(^completion)(void)) {
         int loc = location.y * 4 + location.x + 100;
         UILabel *tile = [weakSelf getTileAt:loc Val:val];
         [weakView addSubview:tile];
@@ -109,11 +104,12 @@
                 completion();
             }
         }];
-    }]];
+    }];
 }
 
 -(void) onGameOver {
     [UIView animateWithDuration:0.5 animations:^{
+        m_demoBtn.alpha = 0.0;
         m_gameOverLbl.alpha = 1.0;
     }];
 }
@@ -122,7 +118,7 @@
     LDBUG(@"score is now %d", score);
     
     m_scoreLbl.text = [NSString stringWithFormat:@"%d", score];
-    if (m_highScore < score) {
+    if (m_highScore < score && !m_isInDemoMode) {
         m_highScore = score;
         m_highScoreLbl.text = [NSString stringWithFormat:@"%d", score];
         NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
@@ -130,19 +126,6 @@
         [def synchronize];
     }
     
-}
-
--(void) onChangesComplete {
-    if (m_lastMove.isInitialized) {
-        // new piece is being moved, so go ahead and animate this one.
-        [self animatePieceFrom:m_lastMove.source To:m_lastMove.target];
-        m_lastMove.isInitialized = NO;
-    }
-    
-    if ([m_animationTempQueue count] > 0) {
-        [m_animationQueue addObject:[NSArray arrayWithArray:m_animationTempQueue]];
-        [m_animationTempQueue removeAllObjects];
-    }
 }
 
 -(void) stopListeningToTouchEvents {
@@ -165,16 +148,14 @@
     // turn off the gesture recognizers while we animate, otherwise it gets confused and doesn't display the board correctly if someone swipes during an animation
     [self stopListeningToTouchEvents];
     
-    for (int i = 0; i < [m_animationQueue count]; i++) {
-        for (int j = 0; j < [m_animationQueue[i] count]; j++) {
-            void(^animation)(void(^completion)(void)) = m_animationQueue[i][j];
-            if (i == [m_animationQueue count] - 1 && j == [m_animationQueue[i] count] - 1) {
-                animation(^() {
-                    [self startListeningToTouchEvents];
-                });
-            } else {
-                animation(nil);
-            }
+    for (int j = 0; j < [m_animationQueue count]; j++) {
+        void(^animation)(void(^completion)(void)) = m_animationQueue[j];
+        if (j == [m_animationQueue count] - 1) {
+            animation(^() {
+                [self startListeningToTouchEvents];
+            });
+        } else {
+            animation(nil);
         }
     }
     
@@ -214,6 +195,8 @@
     [self onScoreUpdate:0];
     
     m_gameOverLbl.alpha = 0;
+    m_demoBtn.alpha = 1.0;
+    m_isInDemoMode = NO;
     [self drawBoard];
 }
 
@@ -231,8 +214,8 @@ UIColor* rgba(int r, int g, int b, int a) {
     self.view.layer.contents = [UIImage imageNamed:@"carbon-fiber"];
     self.view.layer.bounds = self.view.bounds;
     m_animationQueue = [NSMutableArray new];
-    m_animationTempQueue = [NSMutableArray new];
     m_tiles = @{
+        @"1":[self.view viewWithTag:1],
         @"2":[self.view viewWithTag:2],
         @"4":[self.view viewWithTag:4],
         @"8":[self.view viewWithTag:8],
@@ -247,6 +230,7 @@ UIColor* rgba(int r, int g, int b, int a) {
         @"4096":[self.view viewWithTag:4096]
     };
     
+    ((UILabel *)m_tiles[@"1"]).backgroundColor = rgba(255,255,255,1);
     ((UILabel *)m_tiles[@"2"]).backgroundColor = rgba(163,232,163,1);
     ((UILabel *)m_tiles[@"4"]).backgroundColor = rgba( 75,190, 75,1);
     ((UILabel *)m_tiles[@"8"]).backgroundColor = rgba( 45,168, 45,1);
@@ -326,12 +310,37 @@ UIColor* rgba(int r, int g, int b, int a) {
     [self startGame];
 }
 
--(IBAction)suggestAMove:(id)sender {
+-(void) showSuggestion {
+    static int suggestionNum = 0;
+    NSArray *suggestions = @[@"Play again", @"Go do something else for a while", @"Floss", @"Never pet a stray dog", @"Get out of debt", @"Save for a rainy day", @"Take a walk", @"Read more", @"Buy flowers for your better half", @"Hug your kids", @"Never stand on a swivel chair", @"Never put a thumbtack where you might sit on it", @"Call your Mom", @"Read a book to a child"];
+    
+    if (suggestionNum >= [suggestions count]) {
+        suggestionNum = 0;
+    }
+    
+    NSString *suggestion = suggestions[suggestionNum++];
+    m_suggestLbl.text = suggestion;
+    m_suggestLbl.hidden = NO;
+    m_suggestBtn.enabled = NO;
+    
+    [self.view bringSubviewToFront:m_suggestLbl];
+    [UIView animateWithDuration:0.25 animations:^{
+        m_suggestLbl.alpha = 1.0;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.25 delay:2 options:0 animations:^{
+            m_suggestLbl.alpha = 0;
+        } completion:^(BOOL finished) {
+            m_suggestBtn.enabled = YES;
+        }];
+    }];
+}
+
+-(IBAction)suggestMove:(id)sender {
     if (m_board.isGameOver) {
-        // do nothing if the game is over
+        [self showSuggestion];
         return;
     }
-    NSString *move = [m_board suggestAMove];
+    NSString *move = [m_board suggestMove];
     UIImage *arrow = [UIImage imageNamed:move];
     [self.view bringSubviewToFront:m_arrow];
     
@@ -351,7 +360,8 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 -(IBAction)playForMe:(id)sender {
-    NSString *move = [m_board suggestAMove];
+    m_isInDemoMode = YES;
+    NSString *move = [m_board suggestMove];
 
     __weak BLViewController *wself = self;
     m_completion = ^() {

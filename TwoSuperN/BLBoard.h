@@ -10,9 +10,8 @@
 #import "BLLogging.h"
 
 @protocol BLBoardEventListener
--(void) onMergeFrom:(CGPoint)source To:(CGPoint)target Val:(int) val;
+-(void) onMergeFrom:(CGPoint)source To:(CGPoint)target Final:(CGPoint)final Val:(int) val;
 -(void) onMoveFrom:(CGPoint)source To:(CGPoint)target;
--(void) onChangesComplete;
 -(void) onMoveComplete;
 -(void) onNumberAdded:(CGPoint)location Val:(int) val;
 -(void) onScoreUpdate:(int) score;
@@ -27,28 +26,24 @@
     int m_spacesFree;
     int m_score;
     BOOL m_isGameOver;
+    BOOL m_isInDemoMode;
     id<BLBoardEventListener> m_listener;
 }
-
-typedef enum {
-    MOVE_UP,
-    MOVE_DOWN,
-    MOVE_LEFT,
-    MOVE_RIGHT
-} MOVE;
 
 -(NSArray *) columns;
 -(NSArray *) rows;
 -(void) setColumn:(int)col withValues:(NSArray *)vals;
+-(void) setRow:(int)y withValues:(NSArray *)vals;
 -(void) shiftUp;
 -(void) shiftDown;
 -(void) shiftRight;
 -(void) shiftLeft;
 -(void) addDigit;
 -(void) startOver;
--(NSString *) suggestAMove;
+-(NSString *) suggestMove;
 
-@property int score;
-@property BOOL isGameOver;
+@property (readonly) int score;
+@property (readonly) BOOL isGameOver;
+@property BOOL isInDemoMode;
 @property id<BLBoardEventListener> listener;
 @end

@@ -3,39 +3,36 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "-[BLBoard scoreAMove:]:BLBoard.m">
+         contextName = "+[BLBoard merge:x:y:x1:y1:score:listener:]:BLBoard.m">
          <PersistentStrings>
             <PersistentString
-               value = "tempBoard[2][2]">
+               value = "board[x1][y1]">
             </PersistentString>
             <PersistentString
-               value = "tempBoard[2][0]">
+               value = "board[x2][y2]">
             </PersistentString>
             <PersistentString
-               value = "directions">
-            </PersistentString>
-            <PersistentString
-               value = "tempBoard[2][1]">
+               value = "board[x][y]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "-[BLBoard suggestAMove]:BLBoard.m">
+         contextName = "-[KO4096Tests testShouldMergeUp]:TwoSuperNTests.m">
+      </ContextState>
+      <ContextState
+         contextName = "+[BLBoard shiftDown:score:listener:]:BLBoard.m">
          <PersistentStrings>
             <PersistentString
-               value = "counters[3]">
+               value = "board[x][2]">
             </PersistentString>
             <PersistentString
-               value = "counters[0]">
+               value = "board[x][1]">
             </PersistentString>
             <PersistentString
-               value = "counters[2]">
+               value = "board[x][3]">
             </PersistentString>
             <PersistentString
-               value = "counters[4]">
-            </PersistentString>
-            <PersistentString
-               value = "counters[1]">
+               value = "board[x][0]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -61,6 +58,122 @@
       </ContextState>
       <ContextState
          contextName = "-[BLViewController viewDidLoad]:BLViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[BLBoard suggestAMove]:BLBoard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "counters[3]">
+            </PersistentString>
+            <PersistentString
+               value = "self-&gt;m_board">
+            </PersistentString>
+            <PersistentString
+               value = "counters[0]">
+            </PersistentString>
+            <PersistentString
+               value = "counters[2]">
+            </PersistentString>
+            <PersistentString
+               value = "counters[4]">
+            </PersistentString>
+            <PersistentString
+               value = "counters[1]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "+[BLBoard shiftUp:score:listener:]:BLBoard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "board[x][2]">
+            </PersistentString>
+            <PersistentString
+               value = "board[x][1]">
+            </PersistentString>
+            <PersistentString
+               value = "board[x][3]">
+            </PersistentString>
+            <PersistentString
+               value = "board[x][0]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "+[BLBoard shiftRight:score:listener:]:BLBoard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "board[3][y]">
+            </PersistentString>
+            <PersistentString
+               value = "board[1][y]">
+            </PersistentString>
+            <PersistentString
+               value = "board[0][y]">
+            </PersistentString>
+            <PersistentString
+               value = "board[2][y]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "+[BLBoard mergeOrMove:from:to:score:listener:]:BLBoard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "board[2][3]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "+[BLBoard move:x:y:x1:y1:listener:]:BLBoard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "board[x1][y1]">
+            </PersistentString>
+            <PersistentString
+               value = "board[x][y]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[KO4096Tests testShouldMoveAndMergeUp]:TwoSuperNTests.m">
+      </ContextState>
+      <ContextState
+         contextName = "+[BLBoard shiftLeft:score:listener:]:BLBoard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "board[3][y]">
+            </PersistentString>
+            <PersistentString
+               value = "board[1][y]">
+            </PersistentString>
+            <PersistentString
+               value = "board[2][y]">
+            </PersistentString>
+            <PersistentString
+               value = "board[0][y]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[BLBoard scoreMove:score:]:BLBoard.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[BLBoard scoreAMove:]:BLBoard.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "tempBoard[2][2]">
+            </PersistentString>
+            <PersistentString
+               value = "tempBoard[2][0]">
+            </PersistentString>
+            <PersistentString
+               value = "directions">
+            </PersistentString>
+            <PersistentString
+               value = "tempBoard[2][1]">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
    </ContextStates>
 </VariablesViewState>

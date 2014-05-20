@@ -8,159 +8,289 @@
 
 #import "BLBoard.h"
 
+typedef enum {
+    NOTHING = 0,
+    MOVED = 1,
+    MERGED = 2
+} Result;
+
 // Private Methods
 @interface BLBoard ()
-typedef BOOL (^Action)(int[BOARD_WIDTH][BOARD_WIDTH], CGPoint, CGPoint, int *, id<BLBoardEventListener>);
-typedef int(^ShiftAction)(int[BOARD_WIDTH][BOARD_WIDTH], BOOL, Action, int *score, id<BLBoardEventListener>);
--(void) shift:(ShiftAction)shiftAction;
++(BOOL) move:(int[BOARD_WIDTH][BOARD_WIDTH])board x:(int)x y:(int)y x1:(int)x1 y1:(int)y1 listener:(id<BLBoardEventListener>)listener;
++(BOOL) merge:(int[BOARD_WIDTH][BOARD_WIDTH])board x:(int)x y:(int)y x1:(int)x1 y1:(int)y1 score:(int *)score listener:(id<BLBoardEventListener>)listener;
+
 @end
 
 @implementation BLBoard
 
-@synthesize score = m_score, listener = m_listener, isGameOver = m_isGameOver;
+@synthesize score = m_score, listener = m_listener, isGameOver = m_isGameOver, isInDemoMode = m_isInDemoMode;
+
+int getInc(int x, int x1) {
+    int xInc = (x1-x);
+    if (xInc < 0) {
+        xInc = -1;
+    } else if (xInc > 0) {
+        xInc = 1;
+    }
+    
+    return xInc;
+}
 
 // -=-=-=-=-=-=-= Helper Functions -=-=-=-=-=-=-=-=-=-
++(BOOL) merge:(int[BOARD_WIDTH][BOARD_WIDTH])board x:(int)x y:(int)y x1:(int)x1 y1:(int)y1 score:(int *)score listener:(id<BLBoardEventListener>)listener {
+    
+    // range check
+    if (x < 0 || x1 < 0 || y1 < 0 || y < 0 || x >= BOARD_WIDTH || x1 >= BOARD_WIDTH || y1 >= BOARD_WIDTH || y >= BOARD_WIDTH) {
+        return NO;
+    }
+    
+    // if the peices match, merge them
+    if (board[x][y] != 0 && board[x1][y1] == board[x][y]) {
+        board[x][y] = 0;
 
-Action consolidatePiece =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
-    int *source = &board[(int)from.x][(int)from.y];
-    int *target = &board[(int)to.x][(int)to.y];
-    if (*target != 0 && *target == *source && *target < 4096) { // don't merge peices larger than 2048
-        // multiply the source by 2, that way we don't combine all the way down the line
-        *source *= 2;
-        *target *= 0;
-        [listener onMergeFrom:to To:from Val:*source];
-        *score += *source;
+        // keep going in the same direction, if it needs to slide;
+        int xInc = getInc(x,x1); int yInc = getInc(y,y1);
+        int x2 = x1 + xInc; int y2 = y1 + yInc;
+        while (board[x2][y2] == 0 && board[x2+xInc][y2+yInc] == 0 && x2+xInc >= 0 && x2+xInc < BOARD_WIDTH-1 && y2+yInc >= 0 && y2+yInc < BOARD_WIDTH-1) {
+            x2 += xInc;
+            y2 += yInc;
+        }
+        
+        if (board[x2][y2] != 0 || x2 < 0 || x2 > BOARD_WIDTH-1) {
+            x2 = x1;
+            y2 = y1;
+        }
+
+        if (board[x2][y2] != 0 || y2 < 0 || y2 > BOARD_WIDTH-1) {
+            y2 = y1;
+            x2 = x1;
+        }
+
+        board[x2][y2] = board[x1][y1]*2;
+        if (x1 != x2 || y1 != y2) {
+            board[x1][y1] = 0;
+        }
+        
+        [listener onMergeFrom:CGPointMake(x,y) To:CGPointMake(x1,y1) Final:CGPointMake(x2,y2) Val:board[x2][y2]];
+        *score += board[x1][y1];
         [listener onScoreUpdate:*score];
         return YES;
     }
-    return NO;
-};
-
-Action movePiece =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], CGPoint from, CGPoint to, int *score, id<BLBoardEventListener>listener) {
-    int *source = &board[(int)from.x][(int)from.y];
-    int *target = &board[(int)to.x][(int)to.y];
     
-    if (*target == 0 && *source != 0) {
-        *target = *source;
-        *source = 0;
-        [listener onMoveFrom:from To:to];
+    return NO;
+}
+
++(BOOL) move:(int[BOARD_WIDTH][BOARD_WIDTH])board x:(int)x y:(int)y x1:(int)x1 y1:(int)y1 listener:(id<BLBoardEventListener>)listener {
+    
+    // range check
+    if (x < 0 || x1 < 0 || y1 < 0 || y < 0 || x >= BOARD_WIDTH || x1 >= BOARD_WIDTH || y1 >= BOARD_WIDTH || y >= BOARD_WIDTH) {
+        return NO;
+    }
+    
+    if (board[x][y] != 0) {
+        board[x1][y1] = board[x][y];
+        board[x][y] = 0;
+        [listener onMoveFrom:CGPointMake(x,y) To:CGPointMake(x1,y1)];
         return YES;
     }
+    
     return NO;
-};
+    
+}
 
-ShiftAction shiftUp =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
-    int changed = 0;
-    for (int x = 0; x < 4; x++) {
-        for (int y = 1; y < 4; y++) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x,y-1), score, listener);
-            if (actionChanged) {
-                changed++;
++(int) shiftDown:(int[BOARD_WIDTH][BOARD_WIDTH])board score:(int *)score listener:(id<BLBoardEventListener>)listener {
+    int merged = 0;
+    BOOL somethingHappened = NO;
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        // merge
+        for (int y = (BOARD_WIDTH-1); y > 0; y--) {
+            // find the first non-empty spot
+            while (board[x][y] == 0 && y > 0) y--;
 
-                if (onlyOnce) {
-                    break;
-                }
-                
-                for (int y2 = y-1; y2 > 0 ; y2--) {
-                    if (!action(board, CGPointMake(x,y2), CGPointMake(x,y2-1), score, listener)) {
-                        break;
-                    }
-                    
-                    changed++;
-                }
+            // no non-empty spots, this column is empty, skip it
+            if (y <= 0) continue;
+            
+            int y1 = y-1;
+            // advance to find the next peice we are going to act on
+            while (board[x][y1] == 0 && y1 >= 0) y1--;
+            
+            // if the peices match, merge them
+            if ([BLBoard merge:board x:x y:y1 x1:x y1:y score:score listener:listener]) {
+                somethingHappened = YES;
+                merged++;
+                // skip over the merged peice
+                y = y1;
+            }
+        }
+        
+        // move
+        for (int y = (BOARD_WIDTH-1); y > 0; y--) {
+            // find the first empty spot
+            while (board[x][y] != 0 && y > 0) y--;
+            
+            // no empty spots, this row/column is full
+            if (y <= 0) break;
+            
+            // advance to find the next peice we are going to move
+            int y1 = y-1;
+            while (board[x][y1] == 0 && y1 > 0) y1--;
+            
+            if ([BLBoard move:board x:x y:y1 x1:x y1:y listener:listener]) {
+                somethingHappened = YES;
             }
         }
     }
     
-    return changed;
-};
+    if (somethingHappened) {
+        return merged;
+    } else {
+        return -1;
+    }
+}
 
-ShiftAction shiftDown =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
-    int changed = 0;
-    for (int x = 0; x < 4; x++) {
-        for (int y = 2; y >= 0; y--) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x,y+1), score, listener);
-            if (actionChanged) {
-                changed++;
-
-                if (onlyOnce) {
-                    break;
-                }
-                
-                for (int y2 = y+1; y2 < 3; y2++) {
-                    if (!action(board, CGPointMake(x,y2), CGPointMake(x,y2+1), score, listener)) {
-                        break;
-                    }
-                    
-                    changed++;
-                }
++(int) shiftUp:(int[BOARD_WIDTH][BOARD_WIDTH])board score:(int *)score listener:(id<BLBoardEventListener>)listener {
+    int merged = 0;
+    BOOL somethingHappened = NO;
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        // merge
+        for (int y = 0; y < (BOARD_WIDTH-1); y++) {
+            int y1 = y+1;
+            // advance to find the next peice we are going to act on
+            while (board[x][y1] == 0 && y1 < (BOARD_WIDTH-1)) y1++;
+            
+            // if the peices match, merge them
+            if ([BLBoard merge:board x:x y:y1 x1:x y1:y score:score listener:listener]) {
+                somethingHappened = YES;
+                merged++;
+                // skip over the merged peice
+                y = y1+1;
+            }
+        }
+        
+        // move
+        for (int y = 0; y < (BOARD_WIDTH-1); y++) {
+            // find the first empty spot
+            while (board[x][y] != 0 && y < BOARD_WIDTH) y++;
+            
+            // no empty spots, this row/column is full
+            if (y == BOARD_WIDTH) break;
+            
+            // advance to find the next peice we are going to move
+            int y1 = y+1;
+            while (board[x][y1] == 0 && y1 < (BOARD_WIDTH-1)) y1++;
+            
+            if ([BLBoard move:board x:x y:y1 x1:x y1:y listener:listener]) {
+                somethingHappened = YES;
             }
         }
     }
     
-    return changed;
-};
+    if (somethingHappened) {
+        return merged;
+    } else {
+        return -1;
+    }
+}
 
-ShiftAction shiftRight =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
-    int changed = 0;
++(int) shiftRight:(int[BOARD_WIDTH][BOARD_WIDTH])board score:(int *)score listener:(id<BLBoardEventListener>)listener {
+    int merged = 0;
+    BOOL somethingHappened = NO;
     for (int y = 0; y < BOARD_WIDTH; y++) {
-        for (int x = 2; x >= 0; x--) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x+1,y), score, listener);
-            if (actionChanged) {
-                changed++;
-
-                if (onlyOnce) {
-                    break;
-                }
-                
-                for (int x2 = x+1; x2 < 3 ; x2++) {
-                    if(!action(board, CGPointMake(x2,y), CGPointMake(x2+1,y), score, listener)) {
-                        // if we didn't do anything, no point in doing anything more
-                        break;
-                    }
-
-                    changed++;
-                }
+        // merge
+        for (int x = (BOARD_WIDTH-1); x > 0; x--) {
+            // find the first non-empty spot
+            while (board[x][y] == 0 && x > 0) x--;
+            
+            // no non-empty spots, this column is empty, skip it
+            if (x <= 0) continue;
+            
+            int x1 = x-1;
+            // advance to find the next peice we are going to act on
+            while (board[x1][y] == 0 && x1 > 0) x1--;
+            
+            // if the peices match, merge them
+            if ([BLBoard merge:board x:x1 y:y x1:x y1:y score:score listener:listener]) {
+                somethingHappened = YES;
+                merged++;
+                // skip over the merged peice
+                x = x1;
+            }
+        }
+        
+        // move
+        for (int x = (BOARD_WIDTH-1); x > 0; x--) {
+            // find the first empty spot
+            while (board[x][y] != 0 && x > 0) x--;
+            
+            // no empty spots, this row/column is full
+            if (x <= 0) break;
+            
+            // advance to find the next peice we are going to move
+            int x1 = x-1;
+            while (board[x1][y] == 0 && x1 > 0) x1--;
+            
+            if ([BLBoard move:board x:x1 y:y x1:x y1:y listener:listener]) {
+                somethingHappened = YES;
             }
         }
     }
     
-    return changed;
-};
+    if (somethingHappened) {
+        return merged;
+    } else {
+        return -1;
+    }
+}
 
-ShiftAction shiftLeft =
-^(int board[BOARD_WIDTH][BOARD_WIDTH], BOOL onlyOnce, Action action, int *score, id<BLBoardEventListener> listener) {
-    int changed = 0;
++(int) shiftLeft:(int[BOARD_WIDTH][BOARD_WIDTH])board score:(int *)score listener:(id<BLBoardEventListener>)listener {
+    int merged = 0;
+    BOOL somethingHappened = NO;
     for (int y = 0; y < BOARD_WIDTH; y++) {
-        for (int x = 1; x < BOARD_WIDTH; x++) {
-            BOOL actionChanged = action(board, CGPointMake(x,y), CGPointMake(x-1,y), score, listener);
-            if (actionChanged) {
-                changed++;
+        // merge
+        for (int x = 0; x < (BOARD_WIDTH-1); x++) {
+            // find the first non-empty spot
+            while (board[x][y] == 0 && x < (BOARD_WIDTH-1)) x++;
 
-                if (onlyOnce) {
-                    break;
-                }
-                
-                for (int x2 = x-1; x2 > 0 ; x2--) {
-                    if(!action(board, CGPointMake(x2,y), CGPointMake(x2-1,y), score, listener)) {
-                        // if we didn't do anything, no point in doing anything more
-                        break;
-                    }
-                    
-                    changed++;
+            // no non-empty spots, this column is empty, skip it
+            if (x >= (BOARD_WIDTH-1)) continue;
 
-                }
+            int x1 = x+1;
+            // advance to find the next peice we are going to act on
+            while (board[x1][y] == 0 && x1 < (BOARD_WIDTH-1)) x1++;
+            
+            // if the peices match, merge them
+            if ([BLBoard merge:board x:x1 y:y x1:x y1:y score:score listener:listener]) {
+                somethingHappened = YES;
+                merged++;
+                // skip over the merged peice
+                x = x1-1;
+            }
+        }
+        
+        // move
+        for (int x = 0; x < (BOARD_WIDTH-1); x++) {
+            // find the first empty spot
+            while (board[x][y] != 0 && x < BOARD_WIDTH) x++;
+            
+            // no empty spots, this row/column is full
+            if (x == BOARD_WIDTH) break;
+            
+            // advance to find the next peice we are going to move
+            int x1 = x+1;
+            while (board[x1][y] == 0 && x1 < (BOARD_WIDTH-1)) x1++;
+            
+            if ([BLBoard move:board x:x1 y:y x1:x y1:y listener:listener]) {
+                somethingHappened = YES;
             }
         }
     }
     
-    return changed;
-};
+    if (somethingHappened) {
+        return merged;
+    } else {
+        return -1;
+    }
+}
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -176,57 +306,30 @@ ShiftAction shiftLeft =
     return self;
 }
 
-+(int) performMove:(ShiftAction)action board:(int[BOARD_WIDTH][BOARD_WIDTH])board score:(int *)score listener:(id<BLBoardEventListener>)listener {
-    BOOL shifted = NO;
-    int numMerged = 0;
-    shifted |= action(board, NO, movePiece, score, listener) != 0;
-    [listener onChangesComplete];
-    shifted |= (numMerged = action(board, YES, consolidatePiece, score, listener)) != 0;
-    [listener onChangesComplete];
-    shifted |= action(board, NO, movePiece, score, listener) != 0;
-    [listener onChangesComplete];
-
-    if (!shifted) {
-        return -1;
-    } else {
-        return numMerged;
-    }
-}
-
--(void) shift:(ShiftAction)shiftAction {
-    int numMerged = 0;
-    NSString *before = nil;
-
-    if (DBUG_ENABLED) {
-        before = [self description];
-    }
-
-    numMerged = [BLBoard performMove:shiftAction board:m_board score:&m_score listener:m_listener];
+-(void) processTurn:(int)numMerged {
     if (numMerged > -1) {
         LDBUG(@"Num merged: %d", numMerged);
         m_spacesFree += numMerged;
         LDBUG(@"Spaces free: %d", m_spacesFree);
         [self addDigit];
     }
-    
-    LDBUG(@"\nBefore: \n%@\nAfter: \n%@\n", before, [self description]);
     [m_listener onMoveComplete];
 }
 
 -(void) shiftUp {
-    [self shift:shiftUp];
+    [self processTurn:[BLBoard shiftUp:m_board score:&m_score listener:m_listener]];
 }
 
 -(void) shiftDown {
-    [self shift:shiftDown];
+    [self processTurn:[BLBoard shiftDown:m_board score:&m_score listener:m_listener]];
 }
 
 -(void) shiftRight {
-    [self shift:shiftRight];
+    [self processTurn:[BLBoard shiftRight:m_board score:&m_score listener:m_listener]];
 }
 
 -(void) shiftLeft {
-    [self shift:shiftLeft];
+    [self processTurn:[BLBoard shiftLeft:m_board score:&m_score listener:m_listener]];
 }
 
 -(BOOL) checkIfGameIsOver {
@@ -235,17 +338,14 @@ ShiftAction shiftLeft =
     memcpy(tempBoard, m_board, sizeof(tempBoard));
     BOOL shifted = NO;
     // check to see if any of them would move should we try to go in any of these directions
-    shifted |= shiftUp(tempBoard, NO, movePiece, &score, nil) != 0;
-    shifted |= shiftUp(tempBoard, YES, consolidatePiece, &score, nil) != 0;
-    shifted |= shiftDown(tempBoard, NO, movePiece, &score, nil) != 0;
-    shifted |= shiftDown(tempBoard, YES, consolidatePiece, &score, nil) != 0;
-    shifted |= shiftLeft(tempBoard, NO, movePiece, &score, nil) != 0;
-    shifted |= shiftLeft(tempBoard, YES, consolidatePiece, &score, nil) != 0;
-    shifted |= shiftRight(tempBoard, NO, movePiece, &score, nil) != 0;
-    shifted |= shiftRight(tempBoard, YES, consolidatePiece, &score, nil) != 0;
+    shifted |= [BLBoard shiftUp:tempBoard score:&score listener:nil] > 0;
+    shifted |= [BLBoard shiftDown:tempBoard score:&score listener:nil] > 0;
+    shifted |= [BLBoard shiftLeft:tempBoard score:&score listener:nil] > 0;
+    shifted |= [BLBoard shiftRight:tempBoard score:&score listener:nil] > 0;
 
     m_isGameOver = !shifted;
     
+    LINFO(@"Game is %@over", m_isGameOver ? @"" : @"NOT ");
     return !shifted;
 }
 
@@ -308,7 +408,21 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
 
 -(void) setColumn:(int)x withValues:(NSArray *)vals {
     for (int y = 0; y < [vals count]; y++) {
-        m_board[x][y] = [vals[y] intValue];
+        int val = [vals[y] intValue];
+        m_board[x][y] = val;
+        if (val != 0) {
+            m_spacesFree--;
+        }
+    }
+}
+
+-(void) setRow:(int)y withValues:(NSArray *)vals {
+    for (int x = 0; x < [vals count]; x++) {
+        int val = [vals[x] intValue];
+        m_board[x][y] = val;
+        if (val != 0) {
+            m_spacesFree--;
+        }
     }
 }
 
@@ -331,19 +445,19 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
     return a;
 }
 
--(NSString *) suggestAMove {
+-(NSString *) suggestMove {
     NSArray *currentHighScoreMove;
     int currentHighScore = -1;
     static NSString* MOVES[4] = {@"up",@"down",@"left",@"right"};
 
     @autoreleasepool {
-        int lookahead = 2;
+        int lookahead = 4;
         int *counters = malloc(sizeof(int)*lookahead);
         for (int i = 0; i < lookahead; i++) {
             counters[i] = 0;
         }
         
-        while (counters[lookahead - 1] < 3) {
+        while (counters[lookahead - 1] < 4) {
             NSMutableArray *moves = [NSMutableArray new];
             for (int i = 0; i < lookahead; i++) {
                 [moves addObject:MOVES[counters[i]]];
@@ -357,14 +471,18 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
                     break;
                 }
             }
-            if (!incremented) {
-                counters[0]++;
-            }
-            
-            int score = [self scoreAMove:moves];
-            if (score > currentHighScore) {
+
+            LDBUG(@"Trying: %@", moves);
+            int score = 0;
+            int numMerged = [self scoreMove:moves score:&score];
+            if ((numMerged*5) + score > currentHighScore) {
                 currentHighScore = score;
                 currentHighScoreMove = moves;
+            }
+            
+            if (!incremented) {
+                counters[0]++;
+                if (counters[0] > 3) break;
             }
         }
         free(counters);
@@ -374,36 +492,34 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
     return currentHighScoreMove[0];
 }
 
--(int) scoreAMove:(NSArray *)directions {
+-(int) scoreMove:(NSArray *)directions score:(int *)score {
     int tempBoard[BOARD_WIDTH][BOARD_WIDTH];
-    int score = 0;
-    ShiftAction direction;
     BOOL shifted = NO;
-    
+    int merged = 0;
+    int counter = -1;
     
     memcpy(tempBoard, m_board, sizeof(tempBoard));
     for (NSString *dir in directions) {
         if ([dir isEqualToString:@"up"]) {
-            direction = shiftUp;
+            merged = [BLBoard shiftUp:tempBoard score:score listener:nil];
         } else if ([dir isEqualToString:@"down"]) {
-            direction = shiftDown;
+            merged = [BLBoard shiftDown:tempBoard score:score listener:nil];
         } else if ([dir isEqualToString:@"left"]) {
-            direction = shiftLeft;
+            merged = [BLBoard shiftLeft:tempBoard score:score listener:nil];
         } else if ([dir isEqualToString:@"right"]) {
-            direction = shiftRight;
+            merged = [BLBoard shiftRight:tempBoard score:score listener:nil];
         }
         
-        if ([BLBoard performMove:direction board:tempBoard score:&score listener:nil] > -1) {
+        if (merged > -1) {
             shifted |= YES;
-            addDigit(tempBoard);
+            CGPoint p = addDigit(tempBoard);
+            tempBoard[(int)p.x][(int)p.y] = counter--; // this will cause this to be a place holder instead of a tile that can be merged, allowing us to shift to cause a merge later on
+        } else if (!shifted) {
+            return -1;
         }
     }
     
-    if (!shifted) {
-        return -1;
-    } else {
-        return score;
-    }
+    return MAX(0,merged);
 }
 
 @end

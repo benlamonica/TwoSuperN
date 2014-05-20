@@ -9,7 +9,7 @@
 #ifndef TwoSuperN_BLLogging_h
 #define TwoSuperN_BLLogging_h
 
-#define DBG_LVL 3
+#define DBG_LVL 1
 
 #define LDBUG(str,n...) if(DBG_LVL <= 1) NSLog([NSString stringWithFormat:@"[DBUG] %@", str],n)
 #define LINFO(str,n...) if(DBG_LVL <= 2) NSLog([NSString stringWithFormat:@"[INFO] %@", str],n)
