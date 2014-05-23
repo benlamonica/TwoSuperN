@@ -22,6 +22,7 @@
 		B530546418EA25BF00B2631D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B530546218EA25BF00B2631D /* InfoPlist.strings */; };
 		B530547118EA2A7500B2631D /* BLBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = B530547018EA2A7500B2631D /* BLBoard.m */; };
 		B5621FD71915A84E00365F07 /* TwoSuperNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5621FD61915A84E00365F07 /* TwoSuperNTests.m */; };
+		B5D6515E192C1A6500BACD87 /* Main-iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D6515C192C1A6500BACD87 /* Main-iPad.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		B5621FD81915EA9C00365F07 /* BLLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLLogging.h; sourceTree = "<group>"; };
 		B5CFC98F19158D0C00C52F1C /* TwoSuperN-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TwoSuperN-Info.plist"; sourceTree = "<group>"; };
 		B5CFC99019158D0C00C52F1C /* TwoSuperN-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TwoSuperN-Prefix.pch"; sourceTree = "<group>"; };
+		B5D6515D192C1A6500BACD87 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = "Base.lproj/Main-iPad.storyboard"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +121,7 @@
 				B530544918EA25BF00B2631D /* BLAppDelegate.h */,
 				B530544A18EA25BF00B2631D /* BLAppDelegate.m */,
 				B530544C18EA25BF00B2631D /* Main.storyboard */,
+				B5D6515C192C1A6500BACD87 /* Main-iPad.storyboard */,
 				B530544F18EA25BF00B2631D /* BLViewController.h */,
 				B530545018EA25BF00B2631D /* BLViewController.m */,
 				B530545218EA25BF00B2631D /* Images.xcassets */,
@@ -239,6 +242,7 @@
 				B530545318EA25BF00B2631D /* Images.xcassets in Resources */,
 				B530544518EA25BF00B2631D /* InfoPlist.strings in Resources */,
 				B530544E18EA25BF00B2631D /* Main.storyboard in Resources */,
+				B5D6515E192C1A6500BACD87 /* Main-iPad.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +309,14 @@
 				B530546318EA25BF00B2631D /* en */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		B5D6515C192C1A6500BACD87 /* Main-iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B5D6515D192C1A6500BACD87 /* Base */,
+			);
+			name = "Main-iPad.storyboard";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -389,8 +401,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
 				INFOPLIST_FILE = "TwoSuperN/TwoSuperN-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = TwoSuperN;
 				PROVISIONING_PROFILE = "D777438E-32A7-4FCD-B067-33BDC0B4958C";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -405,8 +419,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwoSuperN/TwoSuperN-Prefix.pch";
 				INFOPLIST_FILE = "TwoSuperN/TwoSuperN-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = TwoSuperN;
 				PROVISIONING_PROFILE = "D777438E-32A7-4FCD-B067-33BDC0B4958C";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

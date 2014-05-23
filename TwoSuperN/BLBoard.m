@@ -163,7 +163,7 @@ int getInc(int x, int x1) {
                 somethingHappened = YES;
                 merged++;
                 // skip over the merged peice
-                y = y1+1;
+                y = y1;
             }
         }
         
@@ -298,6 +298,7 @@ int getInc(int x, int x1) {
     self = [super init];
     if (self) {
         m_score = 0;
+        m_undoIdx = 0;
         [self startOver];
         [self addDigit];
         [self addDigit];
@@ -316,19 +317,55 @@ int getInc(int x, int x1) {
     [m_listener onMoveComplete];
 }
 
+-(void) undo {
+    LINFO(@"undoIdx %d undoBufferStart %d", m_undoIdx, m_undoBufferStart);
+    if ((m_undoIdx - 1) >= m_undoBufferStart) {
+        m_undoIdx--;
+        memcpy(m_board, m_undoBuffer[m_undoIdx % MAX_UNDO].board, sizeof(m_board));
+        m_score = m_undoBuffer[m_undoIdx % MAX_UNDO].score;
+        [m_listener onScoreUpdate:m_score];
+        m_spacesFree = 16;
+        for(int i = 0; i < BOARD_WIDTH; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                if (m_board[i][j] != 0) {
+                    m_spacesFree--;
+                }
+            }
+        }
+    }
+}
+
+-(void) saveUndoPoint {
+    // if we are about to overwrite the current start of the undo buffer, then increment so that we don't end up going in circles
+    if (m_undoIdx >= MAX_UNDO && m_undoIdx != m_undoBufferStart && m_undoIdx % MAX_UNDO == m_undoBufferStart % MAX_UNDO) {
+        m_undoBufferStart++;
+    }
+
+    // copy the current board
+    memcpy(m_undoBuffer[m_undoIdx % MAX_UNDO].board, m_board, sizeof(m_board));
+    // and score
+    m_undoBuffer[m_undoIdx % MAX_UNDO].score = m_score;
+    
+    m_undoIdx++;
+}
+
 -(void) shiftUp {
+    [self saveUndoPoint];
     [self processTurn:[BLBoard shiftUp:m_board score:&m_score listener:m_listener]];
 }
 
 -(void) shiftDown {
+    [self saveUndoPoint];
     [self processTurn:[BLBoard shiftDown:m_board score:&m_score listener:m_listener]];
 }
 
 -(void) shiftRight {
+    [self saveUndoPoint];
     [self processTurn:[BLBoard shiftRight:m_board score:&m_score listener:m_listener]];
 }
 
 -(void) shiftLeft {
+    [self saveUndoPoint];
     [self processTurn:[BLBoard shiftLeft:m_board score:&m_score listener:m_listener]];
 }
 

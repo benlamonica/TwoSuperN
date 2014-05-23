@@ -131,6 +131,33 @@
     XCTAssertEqualObjects(@(8), col[2]);
     XCTAssertEqualObjects(@(2), col[3]);
 
+    board = [BLBoard new];
+    [board setRow:0 withValues:@[@(4),@(4),@(4),@(4)]];
+    [board shiftRight];
+    col = [board rows][0];
+    XCTAssertEqualObjects(@(8), col[2]);
+    XCTAssertEqualObjects(@(8), col[3]);
+
+    board = [BLBoard new];
+    [board setRow:0 withValues:@[@(4),@(4),@(4),@(4)]];
+    [board shiftLeft];
+    col = [board rows][0];
+    XCTAssertEqualObjects(@(8), col[0]);
+    XCTAssertEqualObjects(@(8), col[1]);
+
+    board = [BLBoard new];
+    [board setColumn:0 withValues:@[@(4),@(4),@(4),@(4)]];
+    [board shiftDown];
+    col = [board columns][0];
+    XCTAssertEqualObjects(@(8), col[2]);
+    XCTAssertEqualObjects(@(8), col[3]);
+
+    board = [BLBoard new];
+    [board setColumn:0 withValues:@[@(4),@(4),@(4),@(4)]];
+    [board shiftUp];
+    col = [board columns][0];
+    XCTAssertEqualObjects(@(8), col[0]);
+    XCTAssertEqualObjects(@(8), col[1]);
 
 }
 
@@ -141,7 +168,7 @@
     [board setColumn:1 withValues:@[@(32),@(16),@(64),@(8)]];
     [board setColumn:2 withValues:@[@(2),@(8),@(16),@(2)]];
     [board setColumn:3 withValues:@[@(0),@(0),@(0),@(0)]];
-    NSString *move = [board suggestAMove];
+    NSString *move = [board suggestMove];
     XCTAssertEqualObjects(move, @"right", @"should have been something.");
 }
 
@@ -153,7 +180,7 @@
     [board setColumn:1 withValues:@[@(32),@(128),@(64),@(16)]];
     [board setColumn:2 withValues:@[@(2),@(32),@(16),@(8)]];
     [board setColumn:3 withValues:@[@(8),@(2),@(4),@(2)]];
-    NSString *move = [board suggestAMove];
+    NSString *move = [board suggestMove];
     XCTAssertEqualObjects(move, @"down", @"should have been something.");
 }
 
@@ -165,7 +192,7 @@
     [board setColumn:1 withValues:@[@(32),@(128),@(64),@(16)]];
     [board setColumn:2 withValues:@[@(2),@(32),@(16),@(8)]];
     [board setColumn:3 withValues:@[@(8),@(2),@(4),@(2)]];
-    NSString *move = [board suggestAMove];
+    NSString *move = [board suggestMove];
     XCTAssertEqualObjects(move, @"down", @"should have been something.");
 }
 

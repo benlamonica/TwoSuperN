@@ -19,6 +19,12 @@
 @end
 
 #define BOARD_WIDTH 4
+#define MAX_UNDO 255
+
+typedef struct {
+    int board[BOARD_WIDTH][BOARD_WIDTH];
+    int score;
+} UndoInfo;
 
 @interface BLBoard : NSObject
 {
@@ -27,6 +33,9 @@
     int m_score;
     BOOL m_isGameOver;
     BOOL m_isInDemoMode;
+    UndoInfo m_undoBuffer[MAX_UNDO];
+    int m_undoIdx;
+    int m_undoBufferStart;
     id<BLBoardEventListener> m_listener;
 }
 
@@ -40,6 +49,7 @@
 -(void) shiftLeft;
 -(void) addDigit;
 -(void) startOver;
+-(void) undo;
 -(NSString *) suggestMove;
 
 @property (readonly) int score;

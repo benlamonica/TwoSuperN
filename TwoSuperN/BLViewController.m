@@ -167,14 +167,14 @@
 }
 
 -(UILabel *) getTileAt:(int)pos Val:(int)val {
-    UILabel *template = m_tiles[[NSString stringWithFormat:@"%d", val]];
     UIView *loc = [self.view viewWithTag:pos];
     CGRect newFrame = CGRectMake(loc.frame.origin.x, loc.frame.origin.y, loc.frame.size.width, loc.frame.size.height);
+    UILabel *template = (UILabel *)[self.view viewWithTag:1];
     UILabel *impl = [[UILabel alloc] initWithFrame:newFrame];
-    impl.text = template.text;
+    impl.text = [NSString stringWithFormat:@"%d",val];
     impl.font = template.font;
     impl.textAlignment = template.textAlignment;
-    impl.backgroundColor = template.backgroundColor;
+    impl.backgroundColor = m_tileColors[@(val)];
     CALayer *mask = [CALayer layer];
     UIImage *maskImage = [UIImage imageNamed:@"mask"];
     mask.frame = impl.bounds;
@@ -214,45 +214,24 @@ UIColor* rgba(int r, int g, int b, int a) {
     self.view.layer.contents = [UIImage imageNamed:@"carbon-fiber"];
     self.view.layer.bounds = self.view.bounds;
     m_animationQueue = [NSMutableArray new];
-    m_tiles = @{
-        @"1":[self.view viewWithTag:1],
-        @"2":[self.view viewWithTag:2],
-        @"4":[self.view viewWithTag:4],
-        @"8":[self.view viewWithTag:8],
-        @"16":[self.view viewWithTag:16],
-        @"32":[self.view viewWithTag:32],
-        @"64":[self.view viewWithTag:64],
-        @"128":[self.view viewWithTag:128],
-        @"256":[self.view viewWithTag:256],
-        @"512":[self.view viewWithTag:512],
-        @"1024":[self.view viewWithTag:1024],
-        @"2048":[self.view viewWithTag:2048],
-        @"4096":[self.view viewWithTag:4096]
+    
+    m_tileColors = @{
+        @(1):rgba(255,255,255,1),
+        @(2):rgba(163,232,163,1),
+        @(4):rgba( 75,190, 75,1),
+        @(8):rgba( 45,168, 45,1),
+        @(16):rgba(147,209,209,1),
+        @(32):rgba( 56,143,143,1),
+        @(64):rgba( 16,103,103,1),
+        @(128):rgba(255,214,179,1),
+        @(256):rgba(238,159, 94,1),
+        @(512):rgba(210,126, 57,1),
+        @(1024):rgba(255,179,179,1),
+        @(2048):rgba(238, 94, 94,1),
+        @(4096):rgba(210, 57, 57,1)
     };
     
-    ((UILabel *)m_tiles[@"1"]).backgroundColor = rgba(255,255,255,1);
-    ((UILabel *)m_tiles[@"2"]).backgroundColor = rgba(163,232,163,1);
-    ((UILabel *)m_tiles[@"4"]).backgroundColor = rgba( 75,190, 75,1);
-    ((UILabel *)m_tiles[@"8"]).backgroundColor = rgba( 45,168, 45,1);
-    
-    ((UILabel *)m_tiles[@"16"]).backgroundColor = rgba(147,209,209,1);
-    ((UILabel *)m_tiles[@"32"]).backgroundColor = rgba( 56,143,143,1);
-    ((UILabel *)m_tiles[@"64"]).backgroundColor = rgba( 16,103,103,1);
-    
-    ((UILabel *)m_tiles[@"128"]).backgroundColor = rgba(255,214,179,1);
-    ((UILabel *)m_tiles[@"256"]).backgroundColor = rgba(238,159, 94,1);
-    ((UILabel *)m_tiles[@"512"]).backgroundColor = rgba(210,126, 57,1);
-    
-    ((UILabel *)m_tiles[@"1024"]).backgroundColor = rgba(255,179,179,1);
-    ((UILabel *)m_tiles[@"2048"]).backgroundColor = rgba(238, 94, 94,1);
-    ((UILabel *)m_tiles[@"4096"]).backgroundColor = rgba(210, 57, 57,1);
-    
-    for (UIView *tile in [m_tiles allValues]) {
-        tile.hidden = YES;
-    }
-    
     m_activeTiles = [NSMutableArray new];
-    m_lastMove.isInitialized = NO;
     
     NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
     m_highScore = [def integerForKey:@"highscore"];
@@ -290,19 +269,44 @@ UIColor* rgba(int r, int g, int b, int a) {
     }
 }
 
+-(IBAction)undo:(id)sender {
+    if (m_board.isGameOver) {
+        return;
+    }
+    
+    [m_board undo];
+    [self drawBoard];
+}
+
 -(IBAction)swipeUp:(id)sender {
+    if (m_board.isGameOver) {
+        return;
+    }
+    
     [m_board shiftUp];
 }
 
 -(IBAction)swipeDown:(id)sender {
+    if (m_board.isGameOver) {
+        return;
+    }
+    
     [m_board shiftDown];
 }
 
 -(IBAction)swipeLeft:(id)sender {
+    if (m_board.isGameOver) {
+        return;
+    }
+    
     [m_board shiftLeft];
 }
 
 -(void)swipeRight:(id)sender {
+    if (m_board.isGameOver) {
+        return;
+    }
+    
     [m_board shiftRight];
 }
 

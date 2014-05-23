@@ -9,19 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "BLBoard.h"
 
-typedef struct {
-    CGPoint source;
-    CGPoint target;
-    int val;
-    BOOL isInitialized;
-} BLMove;
-
 @interface BLViewController : UIViewController <BLBoardEventListener,UIAlertViewDelegate>
 {
     BLBoard *m_board;
-    NSDictionary *m_tiles;
+    NSDictionary *m_tileColors;
     NSMutableArray *m_activeTiles;
-    BLMove m_lastMove;
     NSMutableArray *m_animationQueue;
     UILabel *m_scoreLbl;
     UILabel *m_highScoreLbl;
@@ -29,6 +21,7 @@ typedef struct {
     UIButton *m_restartBtn;
     UIButton *m_suggestBtn;
     UIButton *m_demoBtn;
+    UIButton *m_undoBtn;
     UILabel *m_gameOverLbl;
     UIImageView *m_arrow;
     UILabel *m_suggestLbl;
@@ -43,6 +36,7 @@ typedef struct {
 -(IBAction)restart:(id)sender;
 -(IBAction)suggestMove:(id)sender;
 -(IBAction)playForMe:(id)sender;
+-(IBAction)undo:(id)sender;
 
 @property IBOutlet UILabel *score;
 @property IBOutlet UILabel *highScore;
