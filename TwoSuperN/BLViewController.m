@@ -15,7 +15,7 @@
 
 @implementation BLViewController
 
-@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, arrow=m_arrow, gameOverLbl=m_gameOverLbl, suggestLbl=m_suggestLbl, suggestBtn=m_suggestBtn, demoBtn=m_demoBtn;
+@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, gameOverLbl=m_gameOverLbl, hintLbl=m_hintLbl, logoBtn=m_logoBtn;
 
 
 -(void) removeActiveTile:(UIView *)tile {
@@ -109,8 +109,11 @@
 
 -(void) onGameOver {
     [UIView animateWithDuration:0.5 animations:^{
-        m_demoBtn.alpha = 0.0;
-        m_gameOverLbl.alpha = 1.0;
+        m_hintLbl.alpha = 0.0;
+        m_gameOverLbl.alpha = 0.25;
+        m_gameOverLbl.hidden = NO;
+        [self.view bringSubviewToFront:m_gameOverLbl];
+        [self pulse:m_gameOverLbl];
     }];
 }
 
@@ -164,6 +167,7 @@
     }
     
     [m_animationQueue removeAllObjects];
+    [self showHint];
 }
 
 -(UILabel *) getTileAt:(int)pos Val:(int)val {
@@ -175,11 +179,7 @@
     impl.font = template.font;
     impl.textAlignment = template.textAlignment;
     impl.backgroundColor = m_tileColors[@(val)];
-    CALayer *mask = [CALayer layer];
-    UIImage *maskImage = [UIImage imageNamed:@"mask"];
-    mask.frame = impl.bounds;
-    [mask setContents:(id)[maskImage CGImage]];
-    [impl.layer setMask:mask];
+    [self applyMask:impl];
     impl.hidden = NO;
     impl.tag = pos + 100;
     [m_activeTiles addObject:impl];
@@ -190,14 +190,33 @@
     m_board = [BLBoard new];
     m_board.listener = self;
     m_completion = nil;
+    m_suggestionNum = 0;
 
     // zero out the score on the screen
     [self onScoreUpdate:0];
     
-    m_gameOverLbl.alpha = 0;
-    m_demoBtn.alpha = 1.0;
+    m_gameOverLbl.hidden = YES;
+    m_gameOverLbl.alpha=0.25;
     m_isInDemoMode = NO;
     [self drawBoard];
+    [self showHint];
+}
+
+-(void) pulse:(UIView *)view {
+    if (view.hidden) {
+        // don't bother to pulse a hidden view. To stop pulsing, just hide the view
+        return;
+    }
+    
+    [UIView animateWithDuration:4 animations:^{
+        view.alpha=0.25;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:4 animations:^{
+            view.alpha=1.0;
+        } completion:^(BOOL finished) {
+            [self performSelector:@selector(pulse:) withObject:view];
+        }];
+    }];
 }
 
 UIColor* rgba(int r, int g, int b, int a) {
@@ -237,7 +256,22 @@ UIColor* rgba(int r, int g, int b, int a) {
     m_highScore = [def integerForKey:@"highscore"];
     m_highScoreLbl.text = [NSString stringWithFormat:@"%ld", m_highScore];
     
+    for (UIView *subview in [self.view subviews]) {
+        if (subview.tag >= 100 && subview.tag <= 115) {
+            [self applyMask:subview];
+        }
+    }
+    
+    [self applyMask:m_logoBtn];
     [self startGame];
+}
+
+-(void) applyMask:(UIView *)view {
+    CALayer *mask = [CALayer layer];
+    UIImage *maskImage = [UIImage imageNamed:@"mask"];
+    mask.frame = view.bounds;
+    [mask setContents:(id)[maskImage CGImage]];
+    [view.layer setMask:mask];
 }
 
 - (void)didReceiveMemoryWarning
@@ -314,53 +348,22 @@ UIColor* rgba(int r, int g, int b, int a) {
     [self startGame];
 }
 
--(void) showSuggestion {
-    static int suggestionNum = 0;
-    NSArray *suggestions = @[@"Play again", @"Go do something else for a while", @"Floss", @"Never pet a stray dog", @"Get out of debt", @"Save for a rainy day", @"Take a walk", @"Read more", @"Buy flowers for your better half", @"Hug your kids", @"Never stand on a swivel chair", @"Never put a thumbtack where you might sit on it", @"Call your Mom", @"Read a book to a child"];
+-(void) showHint {
+    NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game."];
     
-    if (suggestionNum >= [suggestions count]) {
-        suggestionNum = 0;
-    }
-    
-    NSString *suggestion = suggestions[suggestionNum++];
-    m_suggestLbl.text = suggestion;
-    m_suggestLbl.hidden = NO;
-    m_suggestBtn.enabled = NO;
-    
-    [self.view bringSubviewToFront:m_suggestLbl];
-    [UIView animateWithDuration:0.25 animations:^{
-        m_suggestLbl.alpha = 1.0;
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.25 delay:2 options:0 animations:^{
-            m_suggestLbl.alpha = 0;
-        } completion:^(BOOL finished) {
-            m_suggestBtn.enabled = YES;
-        }];
-    }];
-}
-
--(IBAction)suggestMove:(id)sender {
-    if (m_board.isGameOver) {
-        [self showSuggestion];
-        return;
-    }
-    NSString *move = [m_board suggestMove];
-    UIImage *arrow = [UIImage imageNamed:move];
-    [self.view bringSubviewToFront:m_arrow];
-    
-    [m_arrow setImage:arrow];
-    m_arrow.alpha = 0.25;
-    m_arrow.transform = CGAffineTransformMakeScale(0.75, 0.75);
-    
-    [UIView animateWithDuration:0.5 delay:0 options:0 animations:^{
-        m_arrow.transform = CGAffineTransformIdentity;
-        m_arrow.alpha = 0.75;
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.25 animations:^{
-            m_arrow.alpha = 0;
-        } completion:^(BOOL finished) {
-        }];
-    }];
+        if (m_suggestionNum < [suggestions count]) {
+            NSString *suggestion = suggestions[m_suggestionNum++];
+            [UIView animateWithDuration:0.125 animations:^{
+                m_hintLbl.alpha = 0.0;
+            } completion:^(BOOL finished) {
+                m_hintLbl.text = suggestion;
+                [UIView animateWithDuration:0.125 animations:^{
+                    m_hintLbl.alpha = 1.0;
+                }];
+            }];
+        } else {
+            m_hintLbl.alpha = 0.0;
+        }
 }
 
 -(IBAction)playForMe:(id)sender {

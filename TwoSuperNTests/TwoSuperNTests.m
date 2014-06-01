@@ -161,6 +161,34 @@
 
 }
 
+-(void)testShouldNotCrashWhenMerging {
+    BLBoard *board = [BLBoard new];
+    [board setColumn:0 withValues:@[@(4),@(4),@(0),@(0)]];
+    [board setColumn:1 withValues:@[@(4),@(0),@(4),@(0)]];
+    [board setColumn:2 withValues:@[@(4),@(0),@(0),@(4)]];
+    [board setColumn:3 withValues:@[@(4),@(4),@(4),@(4)]];
+    
+    [board shiftLeft];
+
+    board = [BLBoard new];
+    [board setColumn:0 withValues:@[@(4),@(4),@(0),@(4)]];
+    [board setColumn:1 withValues:@[@(4),@(4),@(4),@(0)]];
+    [board setColumn:2 withValues:@[@(0),@(4),@(4),@(4)]];
+    [board setColumn:3 withValues:@[@(4),@(0),@(4),@(4)]];
+
+    [board shiftLeft];
+    
+    board = [BLBoard new];
+    [board setColumn:0 withValues:@[@(2),@(4),@(0),@(4)]];
+    [board setColumn:1 withValues:@[@(2),@(4),@(4),@(0)]];
+    [board setColumn:2 withValues:@[@(0),@(2),@(4),@(4)]];
+    [board setColumn:3 withValues:@[@(2),@(0),@(4),@(4)]];
+    
+    [board shiftLeft];
+
+    NSLog(@"Did we crash?");
+}
+
 - (void)testSuggestMoveShouldNotGetStuckIfAllButTheLastColumnAreFilled
 {
     BLBoard *board = [BLBoard new];
