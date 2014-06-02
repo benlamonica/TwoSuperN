@@ -52,16 +52,10 @@ int getInc(int x, int x1) {
         int xInc = getInc(x,x1); int yInc = getInc(y,y1);
         int x2 = x1 + xInc; int y2 = y1 + yInc;
         
-        if (x2 >= BOARD_WIDTH || x2 < 0 || y2 >= BOARD_WIDTH || y2 < 0) {
-            // we have already exceeded the bounds, just use the x1,y1 values
-            x2 = x1;
-            y2 = y1;
-        } else {
-            // otherwise, find if we need to slide somewhere
-            while (board[x2][y2] == 0 && board[x2+xInc][y2+yInc] == 0 && x2+xInc >= 0 && x2+xInc < BOARD_WIDTH-1 && y2+yInc >= 0 && y2+yInc < BOARD_WIDTH-1) {
-                x2 += xInc;
-                y2 += yInc;
-            }
+        // find out where we're sliding to
+        while ((x2+xInc >= 0) && (x2+xInc < BOARD_WIDTH-1) && (y2+yInc >= 0) && (y2+yInc < BOARD_WIDTH-1) && board[x2][y2] == 0 && board[x2+xInc][y2+yInc] == 0) {
+            x2 += xInc;
+            y2 += yInc;
         }
         
         if (board[x2][y2] != 0 || x2 < 0 || x2 > BOARD_WIDTH-1) {

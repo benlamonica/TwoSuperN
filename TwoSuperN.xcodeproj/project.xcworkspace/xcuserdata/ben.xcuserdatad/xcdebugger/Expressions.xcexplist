@@ -176,13 +176,19 @@
          contextName = "+[BLBoard merge:x:y:x1:y1:score:listener:]:BLBoard.m">
          <PersistentStrings>
             <PersistentString
-               value = "board[x1][y1]">
+               value = "x2+xInc">
             </PersistentString>
             <PersistentString
                value = "board[x2][y2]">
             </PersistentString>
             <PersistentString
+               value = "board[x1][y1]">
+            </PersistentString>
+            <PersistentString
                value = "board[x][y]">
+            </PersistentString>
+            <PersistentString
+               value = "y2+yInc">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
