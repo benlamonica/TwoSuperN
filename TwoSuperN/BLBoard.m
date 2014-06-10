@@ -52,18 +52,24 @@ int getInc(int x, int x1) {
         int xInc = getInc(x,x1); int yInc = getInc(y,y1);
         int x2 = x1 + xInc; int y2 = y1 + yInc;
         
-        // find out where we're sliding to
-        while ((x2+xInc >= 0) && (x2+xInc < BOARD_WIDTH-1) && (y2+yInc >= 0) && (y2+yInc < BOARD_WIDTH-1) && board[x2][y2] == 0 && board[x2+xInc][y2+yInc] == 0) {
-            x2 += xInc;
-            y2 += yInc;
+        if (x2 >= BOARD_WIDTH || x2 < 0 || y2 >= BOARD_WIDTH || y2 < 0) {
+            // we have already exceeded the bounds, just use the x1,y1 values
+            x2 = x1;
+            y2 = y1;
+        } else {
+            // otherwise, find if we need to slide somewhere
+            while (x2+xInc >= 0 && x2+xInc < BOARD_WIDTH-1 && y2+yInc >= 0 && y2+yInc < BOARD_WIDTH-1 && board[x2][y2] == 0 && board[x2+xInc][y2+yInc] == 0) {
+                x2 += xInc;
+                y2 += yInc;
+            }
         }
         
-        if (board[x2][y2] != 0 || x2 < 0 || x2 > BOARD_WIDTH-1) {
+        if (x2 < 0 || x2 > BOARD_WIDTH-1 || board[x2][y2] != 0) {
             x2 = x1;
             y2 = y1;
         }
 
-        if (board[x2][y2] != 0 || y2 < 0 || y2 > BOARD_WIDTH-1) {
+        if (y2 < 0 || y2 > BOARD_WIDTH-1 || board[x2][y2] != 0 ) {
             y2 = y1;
             x2 = x1;
         }
@@ -389,30 +395,32 @@ int getInc(int x, int x1) {
 }
 
 CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
-    int pos = arc4random_uniform(16);
-    int num = arc4random_uniform(2);
-    int timesAround = 0;
-    while (timesAround < 2) {
-        int x = pos / BOARD_WIDTH;
-        int y = pos % BOARD_WIDTH;
-        if (board[x][y] == 0) {
-            if (num == 0) {
-                board[x][y] = 2;
-            } else {
-                board[x][y] = 4;
-            }
-            
-            return CGPointMake(x,y);
-        } else {
-            pos++;
-            if (pos > 15) {
-                pos = 0;
-                timesAround++;
+    NSMutableArray *spaces = [NSMutableArray new];
+    
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        for (int y = 0; y < BOARD_WIDTH; y++) {
+            if (board[x][y] == 0) {
+                [spaces addObject:@(x*BOARD_WIDTH+y)];
             }
         }
     }
-    
-    return CGPointMake(-1,-1);
+
+    if (spaces.count > 0) {
+        int pos = [spaces[arc4random_uniform((int) spaces.count)] intValue];
+        int num = arc4random_uniform(2);
+        
+        int x = pos / BOARD_WIDTH;
+        int y = pos % BOARD_WIDTH;
+        if (num == 0) {
+            board[x][y] = 2;
+        } else {
+            board[x][y] = 4;
+        }
+
+        return CGPointMake(x,y);
+    } else {
+        return CGPointMake(-1,-1);
+    }
 }
 
 -(void) addDigit {

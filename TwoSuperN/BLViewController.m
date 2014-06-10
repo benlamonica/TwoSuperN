@@ -108,12 +108,20 @@
 }
 
 -(void) onGameOver {
+    CGRect pos = m_gameOverLbl.frame;
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        m_gameOverLbl.frame = CGRectMake(pos.origin.x, 0 - pos.size.height, pos.size.width, pos.size.height);
+    } else {
+        m_gameOverLbl.frame = CGRectMake(pos.origin.x, 960, pos.size.width, pos.size.height);
+    }
+
     [UIView animateWithDuration:0.5 animations:^{
         m_hintLbl.alpha = 0.0;
-        m_gameOverLbl.alpha = 0.25;
+        m_gameOverLbl.alpha = 1;
         m_gameOverLbl.hidden = NO;
+        m_gameOverLbl.frame = pos;
         [self.view bringSubviewToFront:m_gameOverLbl];
-        [self pulse:m_gameOverLbl];
     }];
 }
 
