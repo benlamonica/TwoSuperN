@@ -15,15 +15,17 @@
 
 @implementation BLViewController
 
-@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, gameOverLbl=m_gameOverLbl, hintLbl=m_hintLbl, logoBtn=m_logoBtn;
+@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, gameOverLbl=m_gameOverLbl, hintLbl=m_hintLbl, logoBtn=m_logoBtn, boardView=m_boardView;
 
 
 -(void) removeActiveTile:(UIView *)tile {
+    [tile removeFromSuperview];
     [m_activeTiles removeObject:tile];
+    [m_inactiveTiles addObject:tile];
 }
 
 -(void) animateMergeFrom:(CGPoint)source To:(CGPoint)target Final:(CGPoint)final Val:(int)val {
-    __weak id weakView = self.view;
+    __weak id weakView = self.boardView;
     __weak id weakSelf = self;
     [m_animationQueue addObject:^(void(^completion)(void)){
         int fromTag = source.y * 4 + source.x + 200;
@@ -46,8 +48,6 @@
                 toTile.alpha = 0;
                 newTile.alpha = 1;
             } completion:^(BOOL finished) {
-                [fromTile removeFromSuperview];
-                [toTile removeFromSuperview];
                 [weakSelf removeActiveTile: fromTile];
                 [weakSelf removeActiveTile: toTile];
                 LDBUG(@"Merge (%.0f,%.0f) -> (%.0f,%.0f) = %d", source.x,source.y,target.x,target.y, val);
@@ -87,7 +87,7 @@
 }
 
 -(void) onNumberAdded:(CGPoint)location Val:(int) val {
-    __weak id weakView = self.view;
+    __weak id weakView = self.boardView;
     __weak id weakSelf = self;
     [m_animationQueue addObject:^(void(^completion)(void)) {
         int loc = location.y * 4 + location.x + 100;
@@ -179,15 +179,28 @@
 }
 
 -(UILabel *) getTileAt:(int)pos Val:(int)val {
+    UILabel *impl;
+    
+    // using a cache of inactive tiles speeds up animation times
+    if (m_inactiveTiles.count > 0) {
+        impl = [m_inactiveTiles lastObject];
+        [m_inactiveTiles removeLastObject];
+    }
+    
     UIView *loc = [self.view viewWithTag:pos];
     CGRect newFrame = CGRectMake(loc.frame.origin.x, loc.frame.origin.y, loc.frame.size.width, loc.frame.size.height);
+
+    if (impl == nil) {
+        impl = [[UILabel alloc] initWithFrame:newFrame];
+    } else {
+        impl.frame = newFrame;
+    }
+
     UILabel *template = (UILabel *)[self.view viewWithTag:1];
-    UILabel *impl = [[UILabel alloc] initWithFrame:newFrame];
     impl.text = [NSString stringWithFormat:@"%d",val];
     impl.font = template.font;
     impl.textAlignment = template.textAlignment;
     impl.backgroundColor = m_tileColors[@(val)];
-    [self applyMask:impl];
     impl.hidden = NO;
     impl.tag = pos + 100;
     [m_activeTiles addObject:impl];
@@ -259,16 +272,11 @@ UIColor* rgba(int r, int g, int b, int a) {
     };
     
     m_activeTiles = [NSMutableArray new];
+    m_inactiveTiles = [NSMutableArray new];
     
     NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
     m_highScore = [def integerForKey:@"highscore"];
     m_highScoreLbl.text = [NSString stringWithFormat:@"%ld", m_highScore];
-    
-    for (UIView *subview in [self.view subviews]) {
-        if (subview.tag >= 100 && subview.tag <= 115) {
-            [self applyMask:subview];
-        }
-    }
     
     [self applyMask:m_logoBtn];
     [self startGame];
@@ -292,8 +300,8 @@ UIColor* rgba(int r, int g, int b, int a) {
 
 -(void) drawBoard {
     // clear the board
-    for (UIView *v in m_activeTiles) {
-        [v removeFromSuperview];
+    while (m_activeTiles.count > 0) {
+        [self removeActiveTile:[m_activeTiles firstObject]];
     }
     
     // draw the board
@@ -304,7 +312,7 @@ UIColor* rgba(int r, int g, int b, int a) {
             int val = elem.intValue;
             if (val != 0) {
                 UILabel *impl = [self getTileAt:pos Val:val];
-                [self.view addSubview:impl];
+                [self.boardView addSubview:impl];
             }
             pos++;
         }
@@ -359,6 +367,7 @@ UIColor* rgba(int r, int g, int b, int a) {
 -(void) showHint {
     NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game."];
     
+    if (m_hintLbl.alpha > 0.0) {
         if (m_suggestionNum < [suggestions count]) {
             NSString *suggestion = suggestions[m_suggestionNum++];
             [UIView animateWithDuration:0.125 animations:^{
@@ -372,6 +381,7 @@ UIColor* rgba(int r, int g, int b, int a) {
         } else {
             m_hintLbl.alpha = 0.0;
         }
+    }
 }
 
 -(IBAction)playForMe:(id)sender {

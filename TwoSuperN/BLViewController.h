@@ -14,7 +14,9 @@
     BLBoard *m_board;
     NSDictionary *m_tileColors;
     NSMutableArray *m_activeTiles;
+    NSMutableArray *m_inactiveTiles;
     NSMutableArray *m_animationQueue;
+    UIView *m_boardView;
     UILabel *m_scoreLbl;
     UILabel *m_highScoreLbl;
     long m_highScore;
@@ -39,5 +41,6 @@
 @property IBOutlet UILabel *gameOverLbl;
 @property IBOutlet UILabel *hintLbl;
 @property IBOutlet UIButton *logoBtn;
+@property IBOutlet UIView *boardView;
 
 @end
