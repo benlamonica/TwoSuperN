@@ -285,31 +285,51 @@ UIColor* rgba(int r, int g, int b, int a) {
 -(void) swipeDiagonal:(NSArray *)directions {
     __weak BLViewController *wself = self;
     BLDirection dir = [directions[0] intValue];
-//    BLDirection lastDir = [directions[1] intValue];
+    __block BLDirection lastDir = [directions[1] intValue];
     
     if (!m_board.isGameOver) {
-        BLDirection currDir = dir;// & ~lastDir;
+        BLDirection currDir = dir & ~lastDir;
         __block BOOL peiceMoved = NO;
         m_completion = ^() {
             if (peiceMoved) {
-                [wself performSelectorOnMainThread:@selector(swipeDiagonal:) withObject:@[@(dir),@(currDir)] waitUntilDone:NO];
+                [wself performSelectorOnMainThread:@selector(swipeDiagonal:) withObject:@[@(dir),@(lastDir)] waitUntilDone:NO];
             }
         };
 
-        if (!peiceMoved && (currDir & LEFT) == LEFT) {
-            peiceMoved |= [m_board shiftLeft];
-        }
-        
-        if (!peiceMoved && (currDir & RIGHT) == RIGHT) {
-            peiceMoved |= [m_board shiftRight];
-        }
-        
-        if (!peiceMoved && (currDir & UP) == UP) {
-            peiceMoved |= [m_board shiftUp];
-        }
-        
-        if (!peiceMoved && (currDir & DOWN) == DOWN) {
-            peiceMoved |= [m_board shiftDown];
+        while (!peiceMoved) {
+            if (!peiceMoved && (currDir & LEFT) == LEFT) {
+                peiceMoved |= [m_board shiftLeft];
+                if (peiceMoved) {
+                    lastDir = LEFT;
+                }
+            }
+            
+            if (!peiceMoved && (currDir & RIGHT) == RIGHT) {
+                peiceMoved |= [m_board shiftRight];
+                if (peiceMoved) {
+                    lastDir = RIGHT;
+                }
+            }
+            
+            if (!peiceMoved && (currDir & UP) == UP) {
+                peiceMoved |= [m_board shiftUp];
+                if (peiceMoved) {
+                    lastDir = UP;
+                }
+            }
+            
+            if (!peiceMoved && (currDir & DOWN) == DOWN) {
+                peiceMoved |= [m_board shiftDown];
+                if (peiceMoved) {
+                    lastDir = DOWN;
+                }
+            }
+            
+            if (!peiceMoved && currDir == dir) {
+                break;
+            } else {
+                currDir = dir;
+            }
         }
     } else {
         m_completion = nil;
@@ -399,7 +419,7 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 -(void) showHint {
-    NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game."];
+    NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"Swipe diagonally to have the computer repeatedly push tiles in those two directions", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game."];
     
     if (m_hintLbl.alpha > 0.0) {
         if (m_suggestionNum < [suggestions count]) {
