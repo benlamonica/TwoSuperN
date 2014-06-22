@@ -9,6 +9,43 @@
 #import <XCTest/XCTest.h>
 #import "BLBoard.h"
 
+@interface FakeListener : NSObject<BLBoardEventListener> {
+    @public
+    NSMutableArray *actions;
+}
+
+@end
+
+@implementation FakeListener
+-(id) init {
+    self = [super init];
+    if (self) {
+        actions = [NSMutableArray new];
+    }
+    return self;
+}
+
+-(void) onMergeFrom:(CGPoint)source To:(CGPoint)target Final:(CGPoint)final Val:(int) val {
+    [actions addObject:[NSString stringWithFormat:@"MERGE (%d,%d)=>(%d,%d)=>(%d,%d) %d", (int)source.x, (int)source.y, (int)target.x, (int)target.y, (int)final.x, (int)final.y, val]];
+}
+-(void) onMoveFrom:(CGPoint)source To:(CGPoint)target {
+    [actions addObject:[NSString stringWithFormat:@"MOVE (%d,%d)=>(%d,%d)", (int)source.x, (int)source.y, (int)target.x, (int)target.y]];
+}
+-(void) onMoveComplete {
+    [actions addObject:@"MOVE COMPLETE"];
+}
+-(void) onNumberAdded:(CGPoint)location Val:(int) val {
+    [actions addObject:@"NUMBER ADDED"];
+}
+-(void) onScoreUpdate:(int) score {
+    [actions addObject:[NSString stringWithFormat:@"SCORE UPDATED %d", score]];
+}
+-(void) onGameOver {
+    [actions addObject:@"GAME OVER"];
+}
+
+@end
+
 @interface KO4096Tests : XCTestCase
 
 @end
@@ -159,6 +196,26 @@
     XCTAssertEqualObjects(@(8), col[0]);
     XCTAssertEqualObjects(@(8), col[1]);
 
+}
+
+
+-(void) testShouldAnimateSmoothly {
+    BLBoard *board = [BLBoard new];
+    FakeListener *listener = [FakeListener new];
+    [board setColumn:0 withValues:@[@(0),@(2),@(8),@(8)]];
+    [board setColumn:1 withValues:@[@(0),@(0),@(0),@(0)]];
+    [board setColumn:2 withValues:@[@(0),@(0),@(0),@(0)]];
+    [board setColumn:3 withValues:@[@(0),@(0),@(0),@(0)]];
+    board.listener = listener;
+    
+    [board shiftUp];
+    
+    NSArray *actions = listener->actions;
+    XCTAssertEqualObjects(actions[1], @"MERGE (0,3)=>(0,2)=>(0,1) 16");
+    XCTAssertEqualObjects(actions[0], @"SCORE UPDATED 16");
+    XCTAssertEqualObjects(actions[2], @"MOVE (0,1)=>(0,0)");
+    XCTAssertEqualObjects(actions[4], @"NUMBER ADDED");
+    XCTAssertEqualObjects(actions[5], @"MOVE COMPLETE");
 }
 
 -(void)testShouldNotCrashWhenMerging {

@@ -44,6 +44,7 @@ int getInc(int x, int x1) {
         return NO;
     }
     
+    int slide = 0;
     // if the peices match, merge them
     if (board[x][y] != 0 && board[x1][y1] == board[x][y]) {
         board[x][y] = 0;
@@ -62,6 +63,18 @@ int getInc(int x, int x1) {
                 x2 += xInc;
                 y2 += yInc;
             }
+            
+            // to handle the case where the tile you just hit begins to slide, count the number of 0's, and increment the destination by that amount
+            int slideX = x2+xInc;
+            int slideY = y2+yInc;
+            while (slideX >= 0 && slideX < BOARD_WIDTH && slideY >= 0 && slideY < BOARD_WIDTH) {
+                if (board[slideX][slideY] == 0) {
+                    slide++;
+                }
+                slideX += xInc;
+                slideY += yInc;
+            }
+            
         }
         
         if (x2 < 0 || x2 > BOARD_WIDTH-1 || board[x2][y2] != 0) {
@@ -79,9 +92,17 @@ int getInc(int x, int x1) {
             board[x1][y1] = 0;
         }
         
-        [listener onMergeFrom:CGPointMake(x,y) To:CGPointMake(x1,y1) Final:CGPointMake(x2,y2) Val:board[x2][y2]];
+        int val = board[x2][y2];
         *score += board[x2][y2];
         [listener onScoreUpdate:*score];
+
+        if ((slide*xInc) != 0) {
+            x2 += (slide*xInc);
+        } else {
+            y2 += (slide*yInc);
+        }
+        
+        [listener onMergeFrom:CGPointMake(x,y) To:CGPointMake(x1,y1) Final:CGPointMake(x2,y2) Val:val];
         return YES;
     }
     
@@ -315,14 +336,18 @@ int getInc(int x, int x1) {
     return self;
 }
 
--(void) processTurn:(int)numMerged {
+-(BOOL) processTurn:(int)numMerged {
+    BOOL boardChanged = NO;
     if (numMerged > -1) {
+        boardChanged = YES;
+        [self saveUndoPoint];
         LDBUG(@"Num merged: %d", numMerged);
         m_spacesFree += numMerged;
         LDBUG(@"Spaces free: %d", m_spacesFree);
         [self addDigit];
     }
     [m_listener onMoveComplete];
+    return boardChanged;
 }
 
 -(void) undo {
@@ -357,24 +382,20 @@ int getInc(int x, int x1) {
     m_undoIdx++;
 }
 
--(void) shiftUp {
-    [self saveUndoPoint];
-    [self processTurn:[BLBoard shiftUp:m_board score:&m_score listener:m_listener]];
+-(BOOL) shiftUp {
+    return [self processTurn:[BLBoard shiftUp:m_board score:&m_score listener:m_listener]];
 }
 
--(void) shiftDown {
-    [self saveUndoPoint];
-    [self processTurn:[BLBoard shiftDown:m_board score:&m_score listener:m_listener]];
+-(BOOL) shiftDown {
+    return [self processTurn:[BLBoard shiftDown:m_board score:&m_score listener:m_listener]];
 }
 
--(void) shiftRight {
-    [self saveUndoPoint];
-    [self processTurn:[BLBoard shiftRight:m_board score:&m_score listener:m_listener]];
+-(BOOL) shiftRight {
+    return [self processTurn:[BLBoard shiftRight:m_board score:&m_score listener:m_listener]];
 }
 
--(void) shiftLeft {
-    [self saveUndoPoint];
-    [self processTurn:[BLBoard shiftLeft:m_board score:&m_score listener:m_listener]];
+-(BOOL) shiftLeft {
+    return [self processTurn:[BLBoard shiftLeft:m_board score:&m_score listener:m_listener]];
 }
 
 -(BOOL) checkIfGameIsOver {
@@ -567,6 +588,25 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
     }
     
     return MAX(0,merged);
+}
+
+-(void) autoShiftLeft:(BOOL)l Right:(BOOL)r Up:(BOOL)u Dwon:(BOOL)d {
+    BOOL tilesMoved = YES;
+    while (tilesMoved) {
+        tilesMoved = NO;
+        if (l) {
+            tilesMoved |= [self shiftLeft];
+        }
+        if (r) {
+            tilesMoved |= [self shiftRight];
+        }
+        if (u) {
+            tilesMoved |= [self shiftUp];
+        }
+        if (d) {
+            tilesMoved |= [self shiftDown];
+        }
+    }
 }
 
 @end

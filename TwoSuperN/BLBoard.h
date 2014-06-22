@@ -43,10 +43,12 @@ typedef struct {
 -(NSArray *) rows;
 -(void) setColumn:(int)col withValues:(NSArray *)vals;
 -(void) setRow:(int)y withValues:(NSArray *)vals;
--(void) shiftUp;
--(void) shiftDown;
--(void) shiftRight;
--(void) shiftLeft;
+-(BOOL) shiftUp;
+-(BOOL) shiftDown;
+-(BOOL) shiftRight;
+-(BOOL) shiftLeft;
+-(void) autoShiftLeft:(BOOL)l Right:(BOOL)r Up:(BOOL)u Dwon:(BOOL)d;
+
 -(void) addDigit;
 -(void) startOver;
 -(void) undo;

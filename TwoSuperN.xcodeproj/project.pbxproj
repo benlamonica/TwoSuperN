@@ -21,6 +21,7 @@
 		B530545C18EA25BF00B2631D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B530543E18EA25BF00B2631D /* UIKit.framework */; };
 		B530546418EA25BF00B2631D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B530546218EA25BF00B2631D /* InfoPlist.strings */; };
 		B530547118EA2A7500B2631D /* BLBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = B530547018EA2A7500B2631D /* BLBoard.m */; };
+		B540875A1956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B54087591956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m */; };
 		B5621FD71915A84E00365F07 /* TwoSuperNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5621FD61915A84E00365F07 /* TwoSuperNTests.m */; };
 		B5D6515E192C1A6500BACD87 /* Main-iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D6515C192C1A6500BACD87 /* Main-iPad.storyboard */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,8 @@
 		B530546318EA25BF00B2631D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B530546F18EA2A7500B2631D /* BLBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLBoard.h; sourceTree = "<group>"; };
 		B530547018EA2A7500B2631D /* BLBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLBoard.m; sourceTree = "<group>"; };
+		B54087581956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLMultiDirectionalSwipeRecognizer.h; sourceTree = "<group>"; };
+		B54087591956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLMultiDirectionalSwipeRecognizer.m; sourceTree = "<group>"; };
 		B5621FD61915A84E00365F07 /* TwoSuperNTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoSuperNTests.m; sourceTree = "<group>"; };
 		B5621FD81915EA9C00365F07 /* BLLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLLogging.h; sourceTree = "<group>"; };
 		B5CFC98F19158D0C00C52F1C /* TwoSuperN-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TwoSuperN-Info.plist"; sourceTree = "<group>"; };
@@ -129,6 +132,8 @@
 				B530546F18EA2A7500B2631D /* BLBoard.h */,
 				B530547018EA2A7500B2631D /* BLBoard.m */,
 				B5621FD81915EA9C00365F07 /* BLLogging.h */,
+				B54087581956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.h */,
+				B54087591956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m */,
 			);
 			path = TwoSuperN;
 			sourceTree = "<group>";
@@ -264,6 +269,7 @@
 				B530545118EA25BF00B2631D /* BLViewController.m in Sources */,
 				B530544B18EA25BF00B2631D /* BLAppDelegate.m in Sources */,
 				B530547118EA2A7500B2631D /* BLBoard.m in Sources */,
+				B540875A1956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m in Sources */,
 				B530544718EA25BF00B2631D /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

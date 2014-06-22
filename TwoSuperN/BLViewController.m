@@ -7,6 +7,7 @@
 //
 
 #import "BLViewController.h"
+#import "BLMultiDirectionalSwipeRecognizer.h"
 
 @interface BLViewController ()
 -(UILabel *) getTileAt:(int)pos Val:(int)val;
@@ -125,6 +126,8 @@
     }];
 }
 
+
+
 -(void) onScoreUpdate:(int) score {
     LDBUG(@"score is now %d", score);
     
@@ -202,6 +205,7 @@
     impl.textAlignment = template.textAlignment;
     impl.backgroundColor = m_tileColors[@(val)];
     impl.hidden = NO;
+    impl.alpha = 1.0;
     impl.tag = pos + 100;
     [m_activeTiles addObject:impl];
     return impl;
@@ -223,23 +227,6 @@
     [self showHint];
 }
 
--(void) pulse:(UIView *)view {
-    if (view.hidden) {
-        // don't bother to pulse a hidden view. To stop pulsing, just hide the view
-        return;
-    }
-    
-    [UIView animateWithDuration:4 animations:^{
-        view.alpha=0.25;
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:4 animations:^{
-            view.alpha=1.0;
-        } completion:^(BOOL finished) {
-            [self performSelector:@selector(pulse:) withObject:view];
-        }];
-    }];
-}
-
 UIColor* rgba(int r, int g, int b, int a) {
     return [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a];
 }
@@ -259,7 +246,7 @@ UIColor* rgba(int r, int g, int b, int a) {
         @(1):rgba(255,255,255,1),
         @(2):rgba(163,232,163,1),
         @(4):rgba( 75,190, 75,1),
-        @(8):rgba( 45,168, 45,1),
+        @(8):rgba( 0x36, 0x98, 0x00,1),
         @(16):rgba(147,209,209,1),
         @(32):rgba( 56,143,143,1),
         @(64):rgba( 16,103,103,1),
@@ -278,8 +265,55 @@ UIColor* rgba(int r, int g, int b, int a) {
     m_highScore = [def integerForKey:@"highscore"];
     m_highScoreLbl.text = [NSString stringWithFormat:@"%ld", m_highScore];
     
+    BLMultiDirectionalSwipeRecognizer *swipeRecognizer = [BLMultiDirectionalSwipeRecognizer new];
+
+    [swipeRecognizer addTarget:^() { [self swipeDown]; } direction:DOWN];
+    [swipeRecognizer addTarget:^() { [self swipeUp]; } direction:UP];
+    [swipeRecognizer addTarget:^() { [self swipeLeft]; } direction:LEFT];
+    [swipeRecognizer addTarget:^() { [self swipeRight]; } direction:RIGHT];
+    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(DOWN|LEFT), @(NONE)]]; } direction:DOWN|LEFT];
+    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(DOWN|RIGHT), @(NONE)]]; } direction:DOWN|RIGHT];
+    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(UP|LEFT), @(NONE)]]; } direction:UP|LEFT];
+    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(UP|RIGHT),@(NONE)]]; } direction:UP|RIGHT];
+    
+    [self.view addGestureRecognizer:swipeRecognizer];
+    
     [self applyMask:m_logoBtn];
     [self startGame];
+}
+
+-(void) swipeDiagonal:(NSArray *)directions {
+    __weak BLViewController *wself = self;
+    BLDirection dir = [directions[0] intValue];
+//    BLDirection lastDir = [directions[1] intValue];
+    
+    if (!m_board.isGameOver) {
+        BLDirection currDir = dir;// & ~lastDir;
+        __block BOOL peiceMoved = NO;
+        m_completion = ^() {
+            if (peiceMoved) {
+                [wself performSelectorOnMainThread:@selector(swipeDiagonal:) withObject:@[@(dir),@(currDir)] waitUntilDone:NO];
+            }
+        };
+
+        if (!peiceMoved && (currDir & LEFT) == LEFT) {
+            peiceMoved |= [m_board shiftLeft];
+        }
+        
+        if (!peiceMoved && (currDir & RIGHT) == RIGHT) {
+            peiceMoved |= [m_board shiftRight];
+        }
+        
+        if (!peiceMoved && (currDir & UP) == UP) {
+            peiceMoved |= [m_board shiftUp];
+        }
+        
+        if (!peiceMoved && (currDir & DOWN) == DOWN) {
+            peiceMoved |= [m_board shiftDown];
+        }
+    } else {
+        m_completion = nil;
+    }
 }
 
 -(void) applyMask:(UIView *)view {
@@ -328,7 +362,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [self drawBoard];
 }
 
--(IBAction)swipeUp:(id)sender {
+-(void)swipeUp {
     if (m_board.isGameOver) {
         return;
     }
@@ -336,7 +370,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [m_board shiftUp];
 }
 
--(IBAction)swipeDown:(id)sender {
+-(void)swipeDown {
     if (m_board.isGameOver) {
         return;
     }
@@ -344,7 +378,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [m_board shiftDown];
 }
 
--(IBAction)swipeLeft:(id)sender {
+-(void)swipeLeft {
     if (m_board.isGameOver) {
         return;
     }
@@ -352,7 +386,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [m_board shiftLeft];
 }
 
--(void)swipeRight:(id)sender {
+-(void)swipeRight {
     if (m_board.isGameOver) {
         return;
     }
@@ -395,13 +429,13 @@ UIColor* rgba(int r, int g, int b, int a) {
     
     if (!m_board.isGameOver) {
         if ([move isEqualToString:@"up"]) {
-            [self swipeUp:sender];
+            [self swipeUp];
         } else if ([move isEqualToString:@"down"]) {
-            [self swipeDown:sender];
+            [self swipeDown];
         } else if ([move isEqualToString:@"left"]) {
-            [self swipeLeft:sender];
+            [self swipeLeft];
         } else if ([move isEqualToString:@"right"]) {
-            [self swipeRight:sender];
+            [self swipeRight];
         }
     } else {
         m_completion = nil;

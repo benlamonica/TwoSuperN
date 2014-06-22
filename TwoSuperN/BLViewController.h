@@ -28,10 +28,6 @@
     int m_suggestionNum;
 }
 
--(IBAction)swipeUp:(id)sender;
--(IBAction)swipeDown:(id)sender;
--(IBAction)swipeLeft:(id)sender;
--(IBAction)swipeRight:(id)sender;
 -(IBAction)playForMe:(id)sender;
 -(IBAction)restart:(id)sender;
 -(IBAction)undo:(id)sender;
