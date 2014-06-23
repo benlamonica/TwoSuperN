@@ -7,6 +7,7 @@
 //
 
 #import "BLMultiDirectionalSwipeRecognizer.h"
+#import <UIKit/UIGestureRecognizerSubclass.h>
 
 @implementation BLMultiDirectionalSwipeRecognizer
 
@@ -15,6 +16,7 @@
     
     if (self) {
         self->actions = [NSMutableDictionary new];
+        self.delaysTouchesEnded = NO;
     }
     
     return self;
@@ -67,7 +69,7 @@
         if ((angle < 0 && angle > -35) || (angle > 0 && angle < 35)) {
             direction &= (LEFT | RIGHT);
         }
-        
+
         NSLog(@"Direction is %s%s%s%s", ((direction & UP) == UP) ? "UP" : "",
               ((direction & DOWN) == DOWN) ? "DOWN" : "",
               ((direction & LEFT) == LEFT) ? "LEFT" : "",

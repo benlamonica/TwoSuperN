@@ -238,9 +238,9 @@
                                             <constraint firstAttribute="width" constant="32" id="1lW-Vg-b9A"/>
                                             <constraint firstAttribute="height" constant="32" id="eq7-yT-vpP"/>
                                         </constraints>
-                                        <state key="normal" backgroundImage="undo"/>
+                                        <state key="normal" backgroundImage="restart"/>
                                         <connections>
-                                            <action selector="undo:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="xFQ-hG-T6U"/>
+                                            <action selector="restart:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="ecI-eN-kN6"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -258,12 +258,12 @@
                                     <constraint firstAttribute="height" constant="32" id="Gf8-TN-1gc"/>
                                     <constraint firstAttribute="width" constant="32" id="I6l-SA-f0B"/>
                                 </constraints>
-                                <state key="normal" backgroundImage="restart">
+                                <state key="normal" backgroundImage="undo">
                                     <color key="titleColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" red="0.50196081400000003" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <connections>
-                                    <action selector="restart:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="FGy-el-XNi"/>
+                                    <action selector="undo:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="bBe-C0-502"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -283,6 +283,13 @@
                             <constraint firstAttribute="trailing" secondItem="ucZ-BM-DDc" secondAttribute="trailing" id="zb0-Pn-BWq"/>
                             <constraint firstAttribute="trailing" secondItem="TPP-iT-3Ct" secondAttribute="trailing" id="zsh-R5-OhO"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="cmu-31-fAF" appends="YES" id="6P5-vz-jr5"/>
+                            <outletCollection property="gestureRecognizers" destination="V2B-BI-jCM" appends="YES" id="EDZ-D8-v92"/>
+                            <outletCollection property="gestureRecognizers" destination="QKO-2Q-ssV" appends="YES" id="xsX-Oa-UZI"/>
+                            <outletCollection property="gestureRecognizers" destination="acj-Sh-IHA" appends="YES" id="hg9-k2-sc2"/>
+                            <outletCollection property="gestureRecognizers" destination="iDQ-s9-ThZ" appends="YES" id="qK8-rG-Jrf"/>
+                        </connections>
                     </view>
                     <connections>
                         <outlet property="boardView" destination="E5r-HO-Bbo" id="zWo-uf-Go5"/>
@@ -294,6 +301,31 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+                <swipeGestureRecognizer direction="right" id="cmu-31-fAF">
+                    <connections>
+                        <action selector="swipeRight:" destination="vXZ-lx-hvc" id="sw6-91-0rG"/>
+                    </connections>
+                </swipeGestureRecognizer>
+                <swipeGestureRecognizer direction="left" id="V2B-BI-jCM">
+                    <connections>
+                        <action selector="swipeLeft:" destination="vXZ-lx-hvc" id="Gln-Lq-sho"/>
+                    </connections>
+                </swipeGestureRecognizer>
+                <swipeGestureRecognizer direction="up" id="QKO-2Q-ssV">
+                    <connections>
+                        <action selector="swipeUp:" destination="vXZ-lx-hvc" id="Beb-md-9hN"/>
+                    </connections>
+                </swipeGestureRecognizer>
+                <swipeGestureRecognizer direction="down" id="acj-Sh-IHA">
+                    <connections>
+                        <action selector="swipeDown:" destination="vXZ-lx-hvc" id="Vlb-zq-Scq"/>
+                    </connections>
+                </swipeGestureRecognizer>
+                <tapGestureRecognizer numberOfTapsRequired="2" id="iDQ-s9-ThZ">
+                    <connections>
+                        <action selector="moveDiagonal:" destination="vXZ-lx-hvc" id="H6e-Mb-1VP"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
         </scene>
     </scenes>

@@ -9,6 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "BLBoard.h"
 
+typedef enum {
+    NONE = 0,
+    LEFT = 1,
+    RIGHT = 2,
+    UP = 4,
+    DOWN = 8
+} BLDirection;
+
 @interface BLViewController : UIViewController <BLBoardEventListener,UIAlertViewDelegate>
 {
     BLBoard *m_board;
@@ -28,6 +36,11 @@
     int m_suggestionNum;
 }
 
+-(IBAction)moveDiagonal:(id)sender;
+-(IBAction)swipeRight:(id)sender;
+-(IBAction)swipeLeft:(id)sender;
+-(IBAction)swipeUp:(id)sender;
+-(IBAction)swipeDown:(id)sender;
 -(IBAction)playForMe:(id)sender;
 -(IBAction)restart:(id)sender;
 -(IBAction)undo:(id)sender;

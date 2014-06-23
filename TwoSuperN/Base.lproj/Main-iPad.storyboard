@@ -197,6 +197,7 @@
                             <outletCollection property="gestureRecognizers" destination="Ws6-5z-aEQ" appends="YES" id="ALc-3T-Qf3"/>
                             <outletCollection property="gestureRecognizers" destination="dFj-dR-ODY" appends="YES" id="Ctc-mg-DFj"/>
                             <outletCollection property="gestureRecognizers" destination="RgY-nj-xU4" appends="YES" id="KTz-Qq-Mcw"/>
+                            <outletCollection property="gestureRecognizers" destination="ywK-OS-d1O" appends="YES" id="7fz-4u-fy3"/>
                         </connections>
                     </view>
                     <toolbarItems/>
@@ -231,6 +232,11 @@
                         <action selector="swipeDown:" destination="vXZ-lx-hvc" id="aBy-7c-83H"/>
                     </connections>
                 </swipeGestureRecognizer>
+                <tapGestureRecognizer numberOfTapsRequired="2" id="ywK-OS-d1O">
+                    <connections>
+                        <action selector="moveDiagonal:" destination="vXZ-lx-hvc" id="wpB-qU-KwT"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="-141" y="-311"/>
         </scene>

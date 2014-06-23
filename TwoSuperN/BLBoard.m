@@ -340,7 +340,6 @@ int getInc(int x, int x1) {
     BOOL boardChanged = NO;
     if (numMerged > -1) {
         boardChanged = YES;
-        [self saveUndoPoint];
         LDBUG(@"Num merged: %d", numMerged);
         m_spacesFree += numMerged;
         LDBUG(@"Spaces free: %d", m_spacesFree);
@@ -369,6 +368,11 @@ int getInc(int x, int x1) {
 }
 
 -(void) saveUndoPoint {
+    // if the board we're saving is identical to the last one, don't bother saving.
+    if (m_undoIdx > 0 && memcmp(m_undoBuffer[(m_undoIdx - 1) % MAX_UNDO].board, m_board, sizeof(m_board)) == 0) {
+        return;
+    }
+    
     // if we are about to overwrite the current start of the undo buffer, then increment so that we don't end up going in circles
     if (m_undoIdx >= MAX_UNDO && m_undoIdx != m_undoBufferStart && m_undoIdx % MAX_UNDO == m_undoBufferStart % MAX_UNDO) {
         m_undoBufferStart++;
@@ -383,18 +387,22 @@ int getInc(int x, int x1) {
 }
 
 -(BOOL) shiftUp {
+    [self saveUndoPoint];
     return [self processTurn:[BLBoard shiftUp:m_board score:&m_score listener:m_listener]];
 }
 
 -(BOOL) shiftDown {
+    [self saveUndoPoint];
     return [self processTurn:[BLBoard shiftDown:m_board score:&m_score listener:m_listener]];
 }
 
 -(BOOL) shiftRight {
+    [self saveUndoPoint];
     return [self processTurn:[BLBoard shiftRight:m_board score:&m_score listener:m_listener]];
 }
 
 -(BOOL) shiftLeft {
+    [self saveUndoPoint];
     return [self processTurn:[BLBoard shiftLeft:m_board score:&m_score listener:m_listener]];
 }
 
@@ -513,6 +521,27 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
     return a;
 }
 
+-(NSArray *) asArray {
+    NSMutableArray *a = [NSMutableArray new];
+    for (int i = 0; i < BOARD_WIDTH; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            [a addObject:@(m_board[i][j])];
+        }
+    }
+    
+    return a;
+}
+
+-(void) setArray:(NSArray *)array {
+    int arrCounter = 0;
+    for (int i = 0; i < BOARD_WIDTH; i++) {
+        for (int j = 0; j < BOARD_WIDTH; j++) {
+            m_board[i][j] = [array[arrCounter++] intValue];
+        }
+    }
+}
+
+
 -(NSString *) suggestMove {
     NSArray *currentHighScoreMove;
     int currentHighScore = -1;
@@ -590,23 +619,5 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
     return MAX(0,merged);
 }
 
--(void) autoShiftLeft:(BOOL)l Right:(BOOL)r Up:(BOOL)u Dwon:(BOOL)d {
-    BOOL tilesMoved = YES;
-    while (tilesMoved) {
-        tilesMoved = NO;
-        if (l) {
-            tilesMoved |= [self shiftLeft];
-        }
-        if (r) {
-            tilesMoved |= [self shiftRight];
-        }
-        if (u) {
-            tilesMoved |= [self shiftUp];
-        }
-        if (d) {
-            tilesMoved |= [self shiftDown];
-        }
-    }
-}
 
 @end

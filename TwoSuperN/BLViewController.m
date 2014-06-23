@@ -7,7 +7,6 @@
 //
 
 #import "BLViewController.h"
-#import "BLMultiDirectionalSwipeRecognizer.h"
 
 @interface BLViewController ()
 -(UILabel *) getTileAt:(int)pos Val:(int)val;
@@ -212,13 +211,15 @@
 }
 
 -(void) startGame {
-    m_board = [BLBoard new];
+    if (m_board == nil) {
+        m_board = [BLBoard new];
+    }
     m_board.listener = self;
     m_completion = nil;
     m_suggestionNum = 0;
 
     // zero out the score on the screen
-    [self onScoreUpdate:0];
+    [self onScoreUpdate:m_board.score];
     
     m_gameOverLbl.hidden = YES;
     m_gameOverLbl.alpha=0.25;
@@ -265,21 +266,31 @@ UIColor* rgba(int r, int g, int b, int a) {
     m_highScore = [def integerForKey:@"highscore"];
     m_highScoreLbl.text = [NSString stringWithFormat:@"%ld", m_highScore];
     
-    BLMultiDirectionalSwipeRecognizer *swipeRecognizer = [BLMultiDirectionalSwipeRecognizer new];
-
-    [swipeRecognizer addTarget:^() { [self swipeDown]; } direction:DOWN];
-    [swipeRecognizer addTarget:^() { [self swipeUp]; } direction:UP];
-    [swipeRecognizer addTarget:^() { [self swipeLeft]; } direction:LEFT];
-    [swipeRecognizer addTarget:^() { [self swipeRight]; } direction:RIGHT];
-    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(DOWN|LEFT), @(NONE)]]; } direction:DOWN|LEFT];
-    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(DOWN|RIGHT), @(NONE)]]; } direction:DOWN|RIGHT];
-    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(UP|LEFT), @(NONE)]]; } direction:UP|LEFT];
-    [swipeRecognizer addTarget:^() { [self swipeDiagonal:@[@(UP|RIGHT),@(NONE)]]; } direction:UP|RIGHT];
-    
-    [self.view addGestureRecognizer:swipeRecognizer];
-    
     [self applyMask:m_logoBtn];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(saveGameState)
+                                                 name: UIApplicationDidEnterBackgroundNotification
+                                               object: nil];
+    
+    [self loadGameState];
+    
     [self startGame];
+}
+
+-(IBAction)moveDiagonal:(UITapGestureRecognizer *)tap {
+    if (tap.state == UIGestureRecognizerStateEnded) {
+        NSDictionary *corners = @{@(UP|LEFT):[m_boardView viewWithTag:100], @(UP|RIGHT):[m_boardView viewWithTag:103], @(DOWN|LEFT):[m_boardView viewWithTag:112], @(DOWN|RIGHT):[m_boardView viewWithTag:115]};
+        for (NSNumber *direction in corners.keyEnumerator) {
+            UIView *view = corners[direction];
+            CGPoint loc = [tap locationInView:view];
+            if (loc.x >= 0 && loc.x < view.frame.size.width &&
+                loc.y >= 0 && loc.y < view.frame.size.height) {
+                [self swipeDiagonal:@[direction,@(NONE)]];
+                break;
+            }
+        }
+    }
 }
 
 -(void) swipeDiagonal:(NSArray *)directions {
@@ -382,7 +393,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [self drawBoard];
 }
 
--(void)swipeUp {
+-(IBAction)swipeUp:(id)sender {
     if (m_board.isGameOver) {
         return;
     }
@@ -390,7 +401,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [m_board shiftUp];
 }
 
--(void)swipeDown {
+-(IBAction)swipeDown:(id)sender {
     if (m_board.isGameOver) {
         return;
     }
@@ -398,7 +409,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [m_board shiftDown];
 }
 
--(void)swipeLeft {
+-(IBAction)swipeLeft:(id)sender {
     if (m_board.isGameOver) {
         return;
     }
@@ -406,7 +417,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [m_board shiftLeft];
 }
 
--(void)swipeRight {
+-(IBAction)swipeRight:(id)sender {
     if (m_board.isGameOver) {
         return;
     }
@@ -415,11 +426,22 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 -(IBAction)restart:(id)sender {
-    [self startGame];
+    if (m_board.isGameOver) {
+        [self startGame];
+    } else {
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:nil message:@"Start a new game?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
+        [av show];
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) {
+        [self startGame];
+    }
 }
 
 -(void) showHint {
-    NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"Swipe diagonally to have the computer repeatedly push tiles in those two directions", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game."];
+    NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"Double tap a corner square to group tiles in that corner.", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game."];
     
     if (m_hintLbl.alpha > 0.0) {
         if (m_suggestionNum < [suggestions count]) {
@@ -438,6 +460,32 @@ UIColor* rgba(int r, int g, int b, int a) {
     }
 }
 
+-(void) loadGameState {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *dir = [fm URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask][0];
+    NSURL *file = [NSURL URLWithString:@"TwoSuperN-GameState.json" relativeToURL:dir];
+    NSString *data = [NSString stringWithContentsOfURL:file encoding:NSUTF8StringEncoding error:nil];
+
+    if (data != nil) {
+        NSError *error;
+        id hydrated = [NSJSONSerialization JSONObjectWithData:[data dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+        if ([[hydrated class] isSubclassOfClass:[NSDictionary class]]) {
+            m_board = [BLBoard new];
+            m_board.score = [hydrated[@"score"] intValue];
+            [m_board setArray:hydrated[@"board"]];
+        }
+    }
+}
+
+-(void) saveGameState {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *dir = [fm URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask][0];
+    [fm createDirectoryAtURL:dir withIntermediateDirectories:YES attributes:nil error:nil];
+    NSURL *file = [NSURL URLWithString:@"TwoSuperN-GameState.json" relativeToURL:dir];
+    NSData *data = [NSJSONSerialization dataWithJSONObject:@{@"board":[m_board asArray],@"score":@(m_board.score)} options:0 error:nil];
+    [data writeToURL:file atomically:YES];
+}
+
 -(IBAction)playForMe:(id)sender {
     m_isInDemoMode = YES;
     NSString *move = [m_board suggestMove];
@@ -449,13 +497,13 @@ UIColor* rgba(int r, int g, int b, int a) {
     
     if (!m_board.isGameOver) {
         if ([move isEqualToString:@"up"]) {
-            [self swipeUp];
+            [m_board shiftUp];
         } else if ([move isEqualToString:@"down"]) {
-            [self swipeDown];
+            [m_board shiftDown];
         } else if ([move isEqualToString:@"left"]) {
-            [self swipeLeft];
+            [m_board shiftLeft];
         } else if ([move isEqualToString:@"right"]) {
-            [self swipeRight];
+            [m_board shiftRight];
         }
     } else {
         m_completion = nil;

@@ -187,6 +187,12 @@
          contextName = "-[BLBoard saveUndoPoint]:BLBoard.m">
          <PersistentStrings>
             <PersistentString
+               value = "sizeof(m_board)">
+            </PersistentString>
+            <PersistentString
+               value = "m_undoBuffer[(m_undoIdx - 1) % MAX_UNDO]">
+            </PersistentString>
+            <PersistentString
                value = "m_undoIdx % 3">
             </PersistentString>
          </PersistentStrings>

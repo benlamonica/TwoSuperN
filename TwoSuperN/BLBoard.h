@@ -41,8 +41,10 @@ typedef struct {
 
 -(NSArray *) columns;
 -(NSArray *) rows;
+-(NSArray *) asArray;
 -(void) setColumn:(int)col withValues:(NSArray *)vals;
 -(void) setRow:(int)y withValues:(NSArray *)vals;
+-(void) setArray:(NSArray *)array;
 -(BOOL) shiftUp;
 -(BOOL) shiftDown;
 -(BOOL) shiftRight;
@@ -54,7 +56,7 @@ typedef struct {
 -(void) undo;
 -(NSString *) suggestMove;
 
-@property (readonly) int score;
+@property (readwrite) int score;
 @property (readonly) BOOL isGameOver;
 @property BOOL isInDemoMode;
 @property id<BLBoardEventListener> listener;
