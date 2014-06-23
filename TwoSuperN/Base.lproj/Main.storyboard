@@ -253,7 +253,7 @@
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="L7Z-Yx-bFD" userLabel="Restart Button">
-                                <rect key="frame" x="279" y="108" width="32" height="32"/>
+                                <rect key="frame" x="279" y="112" width="32" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="Gf8-TN-1gc"/>
                                     <constraint firstAttribute="width" constant="32" id="I6l-SA-f0B"/>
@@ -276,7 +276,7 @@
                             <constraint firstAttribute="trailing" secondItem="L7Z-Yx-bFD" secondAttribute="trailing" constant="9" id="SYt-IW-Oek"/>
                             <constraint firstAttribute="trailing" secondItem="lrc-Jt-m6Y" secondAttribute="trailing" id="St9-Ao-3hI"/>
                             <constraint firstItem="lrc-Jt-m6Y" firstAttribute="top" secondItem="ucZ-BM-DDc" secondAttribute="bottom" constant="1" id="aj3-Me-2gT"/>
-                            <constraint firstItem="E5r-HO-Bbo" firstAttribute="top" secondItem="L7Z-Yx-bFD" secondAttribute="bottom" constant="4" id="hRD-F9-y6d"/>
+                            <constraint firstItem="E5r-HO-Bbo" firstAttribute="top" secondItem="L7Z-Yx-bFD" secondAttribute="bottom" id="hRD-F9-y6d"/>
                             <constraint firstItem="lrc-Jt-m6Y" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="jwr-kn-LyG"/>
                             <constraint firstItem="m1c-59-A0k" firstAttribute="top" secondItem="lrc-Jt-m6Y" secondAttribute="bottom" id="kZP-n8-gNW"/>
                             <constraint firstItem="ucZ-BM-DDc" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="kp7-o6-r09"/>
