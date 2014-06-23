@@ -22,6 +22,7 @@
 		B530546418EA25BF00B2631D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B530546218EA25BF00B2631D /* InfoPlist.strings */; };
 		B530547118EA2A7500B2631D /* BLBoard.m in Sources */ = {isa = PBXBuildFile; fileRef = B530547018EA2A7500B2631D /* BLBoard.m */; };
 		B540875A1956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B54087591956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m */; };
+		B540875D195860F100B68FA3 /* BLGameDAO.m in Sources */ = {isa = PBXBuildFile; fileRef = B540875C195860F100B68FA3 /* BLGameDAO.m */; };
 		B5621FD71915A84E00365F07 /* TwoSuperNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B5621FD61915A84E00365F07 /* TwoSuperNTests.m */; };
 		B5D6515E192C1A6500BACD87 /* Main-iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D6515C192C1A6500BACD87 /* Main-iPad.storyboard */; };
 /* End PBXBuildFile section */
@@ -57,6 +58,8 @@
 		B530547018EA2A7500B2631D /* BLBoard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLBoard.m; sourceTree = "<group>"; };
 		B54087581956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLMultiDirectionalSwipeRecognizer.h; sourceTree = "<group>"; };
 		B54087591956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLMultiDirectionalSwipeRecognizer.m; sourceTree = "<group>"; };
+		B540875B195860F100B68FA3 /* BLGameDAO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BLGameDAO.h; path = dao/BLGameDAO.h; sourceTree = "<group>"; };
+		B540875C195860F100B68FA3 /* BLGameDAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BLGameDAO.m; path = dao/BLGameDAO.m; sourceTree = "<group>"; };
 		B5621FD61915A84E00365F07 /* TwoSuperNTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoSuperNTests.m; sourceTree = "<group>"; };
 		B5621FD81915EA9C00365F07 /* BLLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLLogging.h; sourceTree = "<group>"; };
 		B5CFC98F19158D0C00C52F1C /* TwoSuperN-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TwoSuperN-Info.plist"; sourceTree = "<group>"; };
@@ -134,6 +137,7 @@
 				B5621FD81915EA9C00365F07 /* BLLogging.h */,
 				B54087581956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.h */,
 				B54087591956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m */,
+				B540875E195860F700B68FA3 /* dao */,
 			);
 			path = TwoSuperN;
 			sourceTree = "<group>";
@@ -165,6 +169,15 @@
 				B530546218EA25BF00B2631D /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B540875E195860F700B68FA3 /* dao */ = {
+			isa = PBXGroup;
+			children = (
+				B540875B195860F100B68FA3 /* BLGameDAO.h */,
+				B540875C195860F100B68FA3 /* BLGameDAO.m */,
+			);
+			name = dao;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -268,6 +281,7 @@
 			files = (
 				B530545118EA25BF00B2631D /* BLViewController.m in Sources */,
 				B530544B18EA25BF00B2631D /* BLAppDelegate.m in Sources */,
+				B540875D195860F100B68FA3 /* BLGameDAO.m in Sources */,
 				B530547118EA2A7500B2631D /* BLBoard.m in Sources */,
 				B540875A1956779500B68FA3 /* BLMultiDirectionalSwipeRecognizer.m in Sources */,
 				B530544718EA25BF00B2631D /* main.m in Sources */,

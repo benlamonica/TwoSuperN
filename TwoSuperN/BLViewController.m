@@ -108,6 +108,9 @@
 }
 
 -(void) onGameOver {
+    // delete the game so that we start with a fresh game on restart
+    [m_dao deleteGame];
+
     CGRect pos = m_gameOverLbl.frame;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -268,14 +271,23 @@ UIColor* rgba(int r, int g, int b, int a) {
     
     [self applyMask:m_logoBtn];
     
+    m_dao = [BLGameDAO new];
+
+    // register for the event that indicates we may be put to sleep
     [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(saveGameState)
+                                             selector: @selector(saveGame)
                                                  name: UIApplicationDidEnterBackgroundNotification
                                                object: nil];
     
-    [self loadGameState];
+    
+    // try to load the game from file, if nothing is present, a new game will be created
+    m_board = [m_dao loadGame];
     
     [self startGame];
+}
+
+-(void) saveGame {
+    [m_dao saveGame:m_board];
 }
 
 -(IBAction)moveDiagonal:(UITapGestureRecognizer *)tap {
@@ -427,6 +439,8 @@ UIColor* rgba(int r, int g, int b, int a) {
 
 -(IBAction)restart:(id)sender {
     if (m_board.isGameOver) {
+        [m_dao deleteGame];
+        m_board = nil;
         [self startGame];
     } else {
         UIAlertView *av = [[UIAlertView alloc] initWithTitle:nil message:@"Start a new game?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
@@ -436,6 +450,8 @@ UIColor* rgba(int r, int g, int b, int a) {
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
+        [m_dao deleteGame];
+        m_board = nil;
         [self startGame];
     }
 }
@@ -458,32 +474,6 @@ UIColor* rgba(int r, int g, int b, int a) {
             m_hintLbl.alpha = 0.0;
         }
     }
-}
-
--(void) loadGameState {
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSURL *dir = [fm URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask][0];
-    NSURL *file = [NSURL URLWithString:@"TwoSuperN-GameState.json" relativeToURL:dir];
-    NSString *data = [NSString stringWithContentsOfURL:file encoding:NSUTF8StringEncoding error:nil];
-
-    if (data != nil) {
-        NSError *error;
-        id hydrated = [NSJSONSerialization JSONObjectWithData:[data dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-        if ([[hydrated class] isSubclassOfClass:[NSDictionary class]]) {
-            m_board = [BLBoard new];
-            m_board.score = [hydrated[@"score"] intValue];
-            [m_board setArray:hydrated[@"board"]];
-        }
-    }
-}
-
--(void) saveGameState {
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSURL *dir = [fm URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask][0];
-    [fm createDirectoryAtURL:dir withIntermediateDirectories:YES attributes:nil error:nil];
-    NSURL *file = [NSURL URLWithString:@"TwoSuperN-GameState.json" relativeToURL:dir];
-    NSData *data = [NSJSONSerialization dataWithJSONObject:@{@"board":[m_board asArray],@"score":@(m_board.score)} options:0 error:nil];
-    [data writeToURL:file atomically:YES];
 }
 
 -(IBAction)playForMe:(id)sender {

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "BLBoard.h"
+#import "BLGameDAO.h"
 
 typedef enum {
     NONE = 0,
@@ -34,6 +35,7 @@ typedef enum {
     void (^m_completion)();
     BOOL m_isInDemoMode;
     int m_suggestionNum;
+    BLGameDAO *m_dao;
 }
 
 -(IBAction)moveDiagonal:(id)sender;

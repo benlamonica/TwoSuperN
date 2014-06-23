@@ -49,7 +49,6 @@ typedef struct {
 -(BOOL) shiftDown;
 -(BOOL) shiftRight;
 -(BOOL) shiftLeft;
--(void) autoShiftLeft:(BOOL)l Right:(BOOL)r Up:(BOOL)u Dwon:(BOOL)d;
 
 -(void) addDigit;
 -(void) startOver;
