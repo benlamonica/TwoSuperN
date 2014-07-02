@@ -457,7 +457,7 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 -(void) showHint {
-    NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"Double tap a corner square to group tiles in that corner.", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game."];
+    NSArray *suggestions = @[@"Swipe left, right, up, or down to move peices.", @"Swipe to combine identical tiles to get points.", @"Double tap a corner square to group tiles in that corner.", @"When all squares are filled, the game is over.", @"Tap the left arrow to undo a move.", @"Tap the circular arrow to restart the game.", @"Tap on the 2^N icon to see a demo of the game.", @"Please give this game a review on the App Store."];
     
     if (m_hintLbl.alpha > 0.0) {
         if (m_suggestionNum < [suggestions count]) {
