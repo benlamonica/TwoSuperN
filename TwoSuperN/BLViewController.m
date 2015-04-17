@@ -94,7 +94,7 @@
         UILabel *tile = [weakSelf getTileAt:loc Val:val];
         [weakView addSubview:tile];
         tile.alpha = 0.75;
-        tile.transform = CGAffineTransformMakeScale(0.01, 0.01);
+        tile.transform = CGAffineTransformMakeScale(0.001, 0.001);
         [UIView animateWithDuration:0.1 delay:0.25 options:0 animations:^{
             tile.alpha = 1.0;
             tile.transform = CGAffineTransformIdentity;
@@ -217,7 +217,6 @@
     if (m_board == nil) {
         m_board = [BLBoard new];
     }
-    m_board.listener = self;
     m_completion = nil;
     m_suggestionNum = 0;
 
@@ -229,6 +228,8 @@
     m_isInDemoMode = NO;
     [self drawBoard];
     [self showHint];
+    [m_board setListener:self];
+
 }
 
 UIColor* rgba(int r, int g, int b, int a) {
@@ -239,28 +240,32 @@ UIColor* rgba(int r, int g, int b, int a) {
     return UIStatusBarStyleLightContent;
 }
 
-- (void)viewDidLoad
+-(void) viewDidLayoutSubviews {
+    
+}
+
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidLoad];
+    [super viewDidAppear:animated];
     self.view.layer.contents = [UIImage imageNamed:@"carbon-fiber"];
     self.view.layer.bounds = self.view.bounds;
     m_animationQueue = [NSMutableArray new];
     
     m_tileColors = @{
-        @(1):rgba(255,255,255,1),
-        @(2):rgba(163,232,163,1),
-        @(4):rgba( 75,190, 75,1),
-        @(8):rgba( 0x36, 0x98, 0x00,1),
-        @(16):rgba(147,209,209,1),
-        @(32):rgba( 56,143,143,1),
-        @(64):rgba( 16,103,103,1),
-        @(128):rgba(255,214,179,1),
-        @(256):rgba(238,159, 94,1),
-        @(512):rgba(210,126, 57,1),
-        @(1024):rgba(255,179,179,1),
-        @(2048):rgba(238, 94, 94,1),
-        @(4096):rgba(210, 57, 57,1)
-    };
+                     @(1):rgba(255,255,255,1),
+                     @(2):rgba(163,232,163,1),
+                     @(4):rgba( 75,190, 75,1),
+                     @(8):rgba( 0x36, 0x98, 0x00,1),
+                     @(16):rgba(147,209,209,1),
+                     @(32):rgba( 56,143,143,1),
+                     @(64):rgba( 16,103,103,1),
+                     @(128):rgba(255,214,179,1),
+                     @(256):rgba(238,159, 94,1),
+                     @(512):rgba(210,126, 57,1),
+                     @(1024):rgba(255,179,179,1),
+                     @(2048):rgba(238, 94, 94,1),
+                     @(4096):rgba(210, 57, 57,1)
+                     };
     
     m_activeTiles = [NSMutableArray new];
     m_inactiveTiles = [NSMutableArray new];
@@ -272,7 +277,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     [self applyMask:m_logoBtn];
     
     m_dao = [BLGameDAO new];
-
+    
     // register for the event that indicates we may be put to sleep
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(saveGame)
@@ -284,6 +289,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     m_board = [m_dao loadGame];
     
     [self startGame];
+
 }
 
 -(void) saveGame {
@@ -449,10 +455,16 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if (buttonIndex == 1) {
-        [m_dao deleteGame];
-        m_board = nil;
-        [self startGame];
+    if ([alertView.title isEqualToString:@"Play for me?"]) {
+        [self reallyPlayForMe];
+        [self reallyPlayForMe];
+        [self reallyPlayForMe]; // speed it up..each time we call this, it goes faster
+    } else {
+        if (buttonIndex == 1) {
+            [m_dao deleteGame];
+            m_board = nil;
+            [self startGame];
+        }
     }
 }
 
@@ -477,12 +489,17 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 -(IBAction)playForMe:(id)sender {
+    UIAlertView *nav = [[UIAlertView alloc] initWithTitle:@"Play for me?" message:@"Do you want the computer to play for you?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
+    [nav show];
+}
+
+-(void) reallyPlayForMe {
     m_isInDemoMode = YES;
     NSString *move = [m_board suggestMove];
-
+    
     __weak BLViewController *wself = self;
     m_completion = ^() {
-        [wself performSelectorOnMainThread:@selector(playForMe:) withObject:sender waitUntilDone:NO];
+        [wself performSelectorOnMainThread:@selector(reallyPlayForMe) withObject:wself waitUntilDone:NO];
     };
     
     if (!m_board.isGameOver) {
@@ -499,6 +516,5 @@ UIColor* rgba(int r, int g, int b, int a) {
         m_completion = nil;
     }
 }
-
 
 @end

@@ -58,5 +58,5 @@ typedef struct {
 @property (readwrite) int score;
 @property (readonly) BOOL isGameOver;
 @property BOOL isInDemoMode;
-@property id<BLBoardEventListener> listener;
+@property (nonatomic, readwrite) id<BLBoardEventListener> listener;
 @end

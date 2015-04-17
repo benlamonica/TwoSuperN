@@ -5,34 +5,34 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>C5763F03-ADCC-4A3F-8A74-78C874841764</string>
+	<string>E3556C5F-5FD3-4B9F-9583-09042722CA92</string>
 	<key>IDESourceControlProjectName</key>
 	<string>TwoSuperN</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>D974690B-78E7-4347-AD23-9B581650CD9F</key>
+		<key>E5D7B9FCADFD598AF267493D2DEDE4EF3A6349D3</key>
 		<string>https://github.com/benlamonica/TwoSuperN.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>TwoSuperN.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>D974690B-78E7-4347-AD23-9B581650CD9F</key>
+		<key>E5D7B9FCADFD598AF267493D2DEDE4EF3A6349D3</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/benlamonica/TwoSuperN.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>D974690B-78E7-4347-AD23-9B581650CD9F</string>
+	<string>E5D7B9FCADFD598AF267493D2DEDE4EF3A6349D3</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>D974690B-78E7-4347-AD23-9B581650CD9F</string>
+			<string>E5D7B9FCADFD598AF267493D2DEDE4EF3A6349D3</string>
 			<key>IDESourceControlWCCName</key>
 			<string>KO4096</string>
 		</dict>

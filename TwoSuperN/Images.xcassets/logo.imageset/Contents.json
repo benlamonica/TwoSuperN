@@ -11,6 +11,10 @@
       "filename" : "logo-140.png"
     },
     {
+      "idiom" : "iphone",
+      "scale" : "3x"
+    },
+    {
       "idiom" : "ipad",
       "scale" : "1x",
       "filename" : "logo-iPad.png"

@@ -86,6 +86,12 @@ int getInc(int x, int x1) {
             y2 = y1;
             x2 = x1;
         }
+        
+        // Scout Bug #1: value check, we don't allow merging past 4096
+        if (board[x2][y2] == 4096 || board[x1][y1] == 4096) {
+            return NO;
+        }
+        
 
         board[x2][y2] = board[x1][y1]*2;
         if (x1 != x2 || y1 != y2) {
@@ -436,11 +442,11 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
 
     if (spaces.count > 0) {
         int pos = [spaces[arc4random_uniform((int) spaces.count)] intValue];
-        int num = arc4random_uniform(2);
+        int num = arc4random_uniform(100);
         
         int x = pos / BOARD_WIDTH;
         int y = pos % BOARD_WIDTH;
-        if (num == 0) {
+        if (num <= 75) {
             board[x][y] = 2;
         } else {
             board[x][y] = 4;
@@ -480,6 +486,17 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
     }
     
     m_spacesFree = 16;
+}
+
+-(void) setListener:(id<BLBoardEventListener>)listener {
+    m_listener = listener;
+    
+    if (listener != nil) {
+        // listener has changed, so notify them that the game is over if it is over
+        if (m_isGameOver) {
+            [listener onGameOver];
+        }
+    }
 }
 
 -(void) setColumn:(int)x withValues:(NSArray *)vals {
@@ -534,11 +551,17 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
 
 -(void) setArray:(NSArray *)array {
     int arrCounter = 0;
+    m_spacesFree = 16;
     for (int i = 0; i < BOARD_WIDTH; i++) {
         for (int j = 0; j < BOARD_WIDTH; j++) {
             m_board[i][j] = [array[arrCounter++] intValue];
+            if (m_board[i][j] != 0) {
+                m_spacesFree--;
+            }
         }
     }
+    
+    m_isGameOver = [self checkIfGameIsOver];
 }
 
 

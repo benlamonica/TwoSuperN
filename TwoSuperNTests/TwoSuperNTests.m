@@ -294,6 +294,18 @@
     XCTAssertEqualObjects(@(8), col[3]);
 }
 
+- (void)testShouldOnlyCombineUpTo4096
+{
+    BLBoard *board = [BLBoard new];
+    [board startOver];
+    [board setColumn:0 withValues:@[@(4096),@(4096),@(4),@(4)]];
+    [board shiftDown];
+    NSArray *col = [board columns][0];
+    XCTAssertEqualObjects(@(4096), col[1]);
+    XCTAssertEqualObjects(@(4096), col[2]);
+    XCTAssertEqualObjects(@(8), col[3]);
+}
+
 - (void)testShouldCombineMultipleTilesPerRowButOnlyIfTheyAreTheSameValue
 {
     BLBoard *board = [BLBoard new];
