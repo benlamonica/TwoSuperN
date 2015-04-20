@@ -455,7 +455,7 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if ([alertView.title isEqualToString:@"Play for me?"]) {
+    if ([alertView.title isEqualToString:@"Play for me?"] && buttonIndex == 1) {
         [self reallyPlayForMe];
         [self reallyPlayForMe];
         [self reallyPlayForMe]; // speed it up..each time we call this, it goes faster
@@ -489,8 +489,10 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 -(IBAction)playForMe:(id)sender {
-    UIAlertView *nav = [[UIAlertView alloc] initWithTitle:@"Play for me?" message:@"Do you want the computer to play for you?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
-    [nav show];
+    if (!m_board.isGameOver && !m_isInDemoMode) {
+        UIAlertView *nav = [[UIAlertView alloc] initWithTitle:@"Play for me?" message:@"Do you want the computer to play for you?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
+        [nav show];
+    }
 }
 
 -(void) reallyPlayForMe {

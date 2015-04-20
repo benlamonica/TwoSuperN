@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="14B25" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14B25" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -171,22 +171,26 @@
                                     <action selector="playForMe:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="zdW-ep-CLD"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2lZ-G6-bKc">
-                                <rect key="frame" x="710" y="148" width="50" height="50"/>
-                                <state key="normal" backgroundImage="restart">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uMC-Vw-bwU" userLabel="Restart Button">
+                                <rect key="frame" x="680" y="162" width="80" height="40"/>
+                                <color key="backgroundColor" red="0.20000000300000001" green="0.20000000300000001" blue="0.20000000300000001" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="18"/>
+                                <state key="normal" title="Restart">
+                                    <color key="titleColor" red="0.97254901959999995" green="0.50196078430000002" blue="0.035294117649999998" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <connections>
-                                    <action selector="restart:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="VcV-td-Kb5"/>
+                                    <action selector="restart:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="aJ8-82-Imf"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rJa-tJ-ZPl">
-                                <rect key="frame" x="640" y="148" width="50" height="50"/>
-                                <state key="normal" backgroundImage="undo">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="5MM-h7-or4" userLabel="Undo Button">
+                                <rect key="frame" x="578" y="162" width="94" height="40"/>
+                                <color key="backgroundColor" red="0.20000000300000001" green="0.20000000300000001" blue="0.20000000300000001" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="18"/>
+                                <state key="normal" title="Undo">
+                                    <color key="titleColor" red="0.97254901959999995" green="0.50196078430000002" blue="0.035294117649999998" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <connections>
-                                    <action selector="undo:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="e6p-Yf-3mv"/>
+                                    <action selector="undo:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="sFT-yA-L0V"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -238,14 +242,12 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="-141" y="-311"/>
+            <point key="canvasLocation" x="-49" y="-284"/>
         </scene>
     </scenes>
     <resources>
         <image name="carbon-fiber" width="768" height="1024"/>
         <image name="logo" width="182" height="182"/>
-        <image name="restart" width="50" height="50"/>
-        <image name="undo" width="50" height="50"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>

@@ -15,5 +15,6 @@
 -(BLBoard *) loadGame;
 -(void) saveGame:(BLBoard *)board;
 -(void) deleteGame;
+-(void) saveHighScore;
 
 @end

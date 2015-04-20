@@ -54,7 +54,7 @@
         
         double x2 = stopPan.x;
         double x1 = 0;
-        double y2 = abs(stopPan.y);
+        double y2 = fabs(stopPan.y);
         double y1 = 0;
         
         

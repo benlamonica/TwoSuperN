@@ -46,7 +46,7 @@ int getInc(int x, int x1) {
     
     int slide = 0;
     // if the peices match, merge them
-    if (board[x][y] != 0 && board[x1][y1] == board[x][y]) {
+    if (board[x][y] != 0 && board[x1][y1] == board[x][y] && board[x1][y1] < 4096) {
         board[x][y] = 0;
 
         // keep going in the same direction, if it needs to slide;
@@ -86,12 +86,6 @@ int getInc(int x, int x1) {
             y2 = y1;
             x2 = x1;
         }
-        
-        // Scout Bug #1: value check, we don't allow merging past 4096
-        if (board[x2][y2] == 4096 || board[x1][y1] == 4096) {
-            return NO;
-        }
-        
 
         board[x2][y2] = board[x1][y1]*2;
         if (x1 != x2 || y1 != y2) {
@@ -418,10 +412,10 @@ int getInc(int x, int x1) {
     memcpy(tempBoard, m_board, sizeof(tempBoard));
     BOOL shifted = NO;
     // check to see if any of them would move should we try to go in any of these directions
-    shifted |= [BLBoard shiftUp:tempBoard score:&score listener:nil] > 0;
-    shifted |= [BLBoard shiftDown:tempBoard score:&score listener:nil] > 0;
-    shifted |= [BLBoard shiftLeft:tempBoard score:&score listener:nil] > 0;
-    shifted |= [BLBoard shiftRight:tempBoard score:&score listener:nil] > 0;
+    shifted |= [BLBoard shiftUp:tempBoard score:&score listener:nil] > -1;
+    shifted |= [BLBoard shiftDown:tempBoard score:&score listener:nil] > -1;
+    shifted |= [BLBoard shiftLeft:tempBoard score:&score listener:nil] > -1;
+    shifted |= [BLBoard shiftRight:tempBoard score:&score listener:nil] > -1;
 
     m_isGameOver = !shifted;
     
@@ -447,9 +441,9 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
         int x = pos / BOARD_WIDTH;
         int y = pos % BOARD_WIDTH;
         if (num <= 75) {
-            board[x][y] = 2;
+            board[x][y] = 2048;
         } else {
-            board[x][y] = 4;
+            board[x][y] = 4096;
         }
 
         return CGPointMake(x,y);
