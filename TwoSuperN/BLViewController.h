@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GameKit/GameKit.h>
 #import "BLBoard.h"
 #import "BLGameDAO.h"
 
@@ -18,7 +19,7 @@ typedef enum {
     DOWN = 8
 } BLDirection;
 
-@interface BLViewController : UIViewController <BLBoardEventListener,UIAlertViewDelegate>
+@interface BLViewController : UIViewController <BLBoardEventListener,UIAlertViewDelegate,GKGameCenterControllerDelegate>
 {
     BLBoard *m_board;
     NSDictionary *m_tileColors;
@@ -36,6 +37,10 @@ typedef enum {
     BOOL m_isInDemoMode;
     int m_suggestionNum;
     BLGameDAO *m_dao;
+    UIView *m_splash;
+    GKGameCenterViewController *m_highscoreView;
+    GKLocalPlayer *m_player;
+    UIViewController *m_gcView;
 }
 
 -(IBAction)moveDiagonal:(id)sender;
@@ -46,6 +51,7 @@ typedef enum {
 -(IBAction)playForMe:(id)sender;
 -(IBAction)restart:(id)sender;
 -(IBAction)undo:(id)sender;
+-(IBAction)showHighScores:(id)sender;
 
 @property IBOutlet UILabel *score;
 @property IBOutlet UILabel *highScore;
@@ -53,5 +59,7 @@ typedef enum {
 @property IBOutlet UILabel *hintLbl;
 @property IBOutlet UIButton *logoBtn;
 @property IBOutlet UIView *boardView;
+@property GKLocalPlayer *player;
+@property UIViewController *gcView;
 
 @end

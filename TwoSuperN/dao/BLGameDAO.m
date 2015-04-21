@@ -8,6 +8,7 @@
 
 #import "BLGameDAO.h"
 #import "BLBoard.h"
+#import <GameKit/GameKit.h>
 
 @implementation BLGameDAO
 
@@ -45,6 +46,19 @@
 -(void) deleteGame {
     NSURL *file = [self getStateFile];
     [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+}
+
+-(void) saveHighScore:(NSInteger) newHighScore {
+    GKScore *score = [[GKScore alloc] initWithLeaderboardIdentifier:@"2SuperN"];
+    score.value = newHighScore;
+    [GKScore reportScores:@[score] withCompletionHandler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"Problem while sending score. %@", error);
+        } else {
+            NSLog(@"Score sent to GameCenter.");
+        }
+    }];
+    
 }
 
 @end

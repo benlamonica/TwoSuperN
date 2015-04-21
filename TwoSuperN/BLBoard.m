@@ -441,9 +441,9 @@ CGPoint addDigit(int board[BOARD_WIDTH][BOARD_WIDTH]) {
         int x = pos / BOARD_WIDTH;
         int y = pos % BOARD_WIDTH;
         if (num <= 75) {
-            board[x][y] = 2048;
+            board[x][y] = 2;
         } else {
-            board[x][y] = 4096;
+            board[x][y] = 4;
         }
 
         return CGPointMake(x,y);

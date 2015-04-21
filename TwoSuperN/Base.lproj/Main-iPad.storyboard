@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14B25" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -193,6 +195,15 @@
                                     <action selector="undo:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="sFT-yA-L0V"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tzn-JW-s0H" userLabel="HighScoreBtn">
+                                <rect key="frame" x="500" y="20" width="248" height="86"/>
+                                <state key="normal">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="showHighScores:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="ner-pp-fEp"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
@@ -242,12 +253,79 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="-49" y="-284"/>
+            <point key="canvasLocation" x="11" y="-286"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="buO-sh-t3k">
+            <objects>
+                <viewController storyboardIdentifier="splash" id="ywf-a5-ghP" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="a2s-n6-5lU"/>
+                        <viewControllerLayoutGuide type="bottom" id="2At-F4-ppC"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Puc-C4-7SX">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="  Copyright (c) 2015 Ben La Monica. All rights reserved." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="bL1-k4-oLH">
+                                <rect key="frame" x="20" y="439" width="441" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact">
+                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                </variation>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="carbon-fiber" translatesAutoresizingMaskIntoConstraints="NO" id="j0g-Io-Ski">
+                                <rect key="frame" x="-16" y="-20" width="496" height="500"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo-huge" translatesAutoresizingMaskIntoConstraints="NO" id="WCK-FG-Izx">
+                                <rect key="frame" x="116" y="106" width="248" height="248"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="WCK-FG-Izx" secondAttribute="height" multiplier="1:1" id="11X-CG-X0z"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bes-sg-aGf">
+                                <rect key="frame" x="155" y="379" width="172" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="52" id="Ul3-n4-xUo"/>
+                                </constraints>
+                                <string key="text">TwoSuperN
+©2015 Ben La Monica</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Bes-sg-aGf" firstAttribute="centerX" secondItem="j0g-Io-Ski" secondAttribute="centerX" constant="8.5" id="4sz-7A-0qd"/>
+                            <constraint firstAttribute="bottom" secondItem="bL1-k4-oLH" secondAttribute="bottom" constant="20" id="7ca-u0-riC"/>
+                            <constraint firstItem="j0g-Io-Ski" firstAttribute="leading" secondItem="Puc-C4-7SX" secondAttribute="leading" constant="-16" id="IQT-1C-hvy"/>
+                            <constraint firstAttribute="centerX" secondItem="bL1-k4-oLH" secondAttribute="centerX" id="JZ9-uD-QEd"/>
+                            <constraint firstAttribute="bottom" secondItem="j0g-Io-Ski" secondAttribute="bottom" id="T71-fS-xGZ"/>
+                            <constraint firstItem="Bes-sg-aGf" firstAttribute="top" secondItem="WCK-FG-Izx" secondAttribute="bottom" constant="25" id="bhQ-XY-BLm"/>
+                            <constraint firstItem="j0g-Io-Ski" firstAttribute="centerY" secondItem="WCK-FG-Izx" secondAttribute="centerY" id="cPq-n1-pON"/>
+                            <constraint firstItem="bL1-k4-oLH" firstAttribute="leading" secondItem="Puc-C4-7SX" secondAttribute="leading" constant="20" symbolic="YES" id="gaV-0t-qP0"/>
+                            <constraint firstAttribute="trailing" secondItem="j0g-Io-Ski" secondAttribute="trailing" id="kh7-Ob-uaD"/>
+                            <constraint firstItem="j0g-Io-Ski" firstAttribute="width" secondItem="WCK-FG-Izx" secondAttribute="width" multiplier="2" id="lwL-gB-fuc"/>
+                            <constraint firstItem="j0g-Io-Ski" firstAttribute="top" secondItem="Puc-C4-7SX" secondAttribute="top" constant="-20" id="q1H-Q5-WVo"/>
+                            <constraint firstItem="j0g-Io-Ski" firstAttribute="centerX" secondItem="WCK-FG-Izx" secondAttribute="centerX" constant="-8" id="wsw-ad-qDH"/>
+                        </constraints>
+                    </view>
+                    <nil key="simulatedStatusBarMetrics"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="480" height="480"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="29T-Q3-ac2" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1004" y="-341"/>
         </scene>
     </scenes>
     <resources>
         <image name="carbon-fiber" width="768" height="1024"/>
         <image name="logo" width="182" height="182"/>
+        <image name="logo-huge" width="1024" height="1024"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>

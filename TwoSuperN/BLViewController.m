@@ -15,7 +15,7 @@
 
 @implementation BLViewController
 
-@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, gameOverLbl=m_gameOverLbl, hintLbl=m_hintLbl, logoBtn=m_logoBtn, boardView=m_boardView;
+@synthesize score=m_scoreLbl, highScore=m_highScoreLbl, gameOverLbl=m_gameOverLbl, hintLbl=m_hintLbl, logoBtn=m_logoBtn, boardView=m_boardView, gcView=m_gcView, player=m_player;
 
 
 -(void) removeActiveTile:(UIView *)tile {
@@ -110,6 +110,11 @@
 -(void) onGameOver {
     // delete the game so that we start with a fresh game on restart
     [m_dao deleteGame];
+    
+    // save the high score to Game Center
+    if (!m_isInDemoMode) {
+        [m_dao saveHighScore:m_highScore];
+    }
 
     CGRect pos = m_gameOverLbl.frame;
     
@@ -183,6 +188,26 @@
     [self showHint];
 }
 
+- (void)gameCenterViewControllerDidFinish:(GKGameCenterViewController *)gcvc {
+    [gcvc dismissViewControllerAnimated:YES completion:^{
+        m_highscoreView = nil;
+    }];
+}
+
+-(void) showHighScores:(id)sender {
+    if (m_player.isAuthenticated) {
+        m_highscoreView = [[GKGameCenterViewController alloc] init];
+        if (m_highscoreView != nil) {
+            m_highscoreView.gameCenterDelegate = self;
+            m_highscoreView.viewState = GKGameCenterViewControllerStateLeaderboards;
+            m_highscoreView.leaderboardIdentifier = @"2SuperN";
+            [self presentViewController:m_highscoreView animated:YES completion:nil];
+        }
+    } else {
+        [self askToUseGameCenter];
+    }
+}
+
 -(UILabel *) getTileAt:(int)pos Val:(int)val {
     UILabel *impl;
     
@@ -240,15 +265,7 @@ UIColor* rgba(int r, int g, int b, int a) {
     return UIStatusBarStyleLightContent;
 }
 
--(void) viewDidLayoutSubviews {
-    
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    self.view.layer.contents = [UIImage imageNamed:@"carbon-fiber"];
-    self.view.layer.bounds = self.view.bounds;
+- (void)viewDidLoad {
     m_animationQueue = [NSMutableArray new];
     
     m_tileColors = @{
@@ -274,8 +291,6 @@ UIColor* rgba(int r, int g, int b, int a) {
     m_highScore = [def integerForKey:@"highscore"];
     m_highScoreLbl.text = [NSString stringWithFormat:@"%ld", m_highScore];
     
-    [self applyMask:m_logoBtn];
-    
     m_dao = [BLGameDAO new];
     
     // register for the event that indicates we may be put to sleep
@@ -287,9 +302,49 @@ UIColor* rgba(int r, int g, int b, int a) {
     
     // try to load the game from file, if nothing is present, a new game will be created
     m_board = [m_dao loadGame];
-    
-    [self startGame];
+    m_splash = [[self.storyboard instantiateViewControllerWithIdentifier:@"splash"] view];
+    [self.view addSubview:m_splash];
+    m_player = [GKLocalPlayer localPlayer];
+}
 
+- (void) hideSplash {
+    [self startGame]; // start game before adding the splash view, so that our view hierarchy is correct
+    [self.view bringSubviewToFront:m_splash]; // startGame adds some views, so bring the splash to the front again to prevent them from showing (needed for iPad, iphone doesn't have problem)
+    [UIView animateWithDuration:1.0 animations:^{
+        m_splash.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        [m_splash removeFromSuperview];
+        m_splash = nil;
+    }];
+    
+}
+
+-(void) askToUseGameCenter {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Sign-In To GameCenter?" message:@"TwoSuperN uses GameCenter to record your highscore. Do you want to sign in to GameCenter?" delegate:self cancelButtonTitle:@"Just Store High Score Locally" otherButtonTitles:@"Sign-in To GameCenter", nil];
+    [alert show];
+}
+
+-(void) authenticateGameCenter {
+    __weak BLViewController *wself = self;
+    m_player.authenticateHandler = ^(UIViewController *gcView, NSError *err) {
+        if (!wself.player.isAuthenticated) {
+            wself.gcView = gcView;
+            
+            NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+            BOOL dontUseGameCenter = [def boolForKey:@"DontUseGameCenter"]; // this is a negative, because if it's not set, it returns NO
+            if (!dontUseGameCenter) {
+                [wself askToUseGameCenter];
+            }
+        }
+    };
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [self applyMask:m_logoBtn];
+    [super viewDidAppear:animated];
+    [self performSelector:@selector(hideSplash) withObject:nil afterDelay:2.0];
+    [self authenticateGameCenter];
 }
 
 -(void) saveGame {
@@ -455,7 +510,21 @@ UIColor* rgba(int r, int g, int b, int a) {
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if ([alertView.title isEqualToString:@"Play for me?"] && buttonIndex == 1) {
+    if ([alertView.title isEqualToString:@"Sign-In To GameCenter?"]) {
+        if (buttonIndex == 1) {
+            NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+            [def setBool:NO forKey:@"DontUseGameCenter"];
+            [def synchronize];
+            
+            if (m_gcView != nil) {
+                [self presentViewController:m_gcView animated:YES completion:nil];
+            }
+        } else {
+            NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+            [def setBool:YES forKey:@"DontUseGameCenter"];
+            [def synchronize];
+        }
+    } else if ([alertView.title isEqualToString:@"Play for me?"] && buttonIndex == 1) {
         [self reallyPlayForMe];
         [self reallyPlayForMe];
         [self reallyPlayForMe]; // speed it up..each time we call this, it goes faster

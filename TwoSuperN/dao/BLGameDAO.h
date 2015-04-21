@@ -15,6 +15,6 @@
 -(BLBoard *) loadGame;
 -(void) saveGame:(BLBoard *)board;
 -(void) deleteGame;
--(void) saveHighScore;
+-(void) saveHighScore:(NSInteger) newHighScore;
 
 @end
